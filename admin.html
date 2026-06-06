@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EduAdmin — Gestion Académique</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg0:#06080f;--bg1:#0c0f1a;--bg2:#111625;--bg3:#171d2e;--bg4:#1e2538;--bg5:#252c42;
+  --ln:rgba(255,255,255,.055);--ln2:rgba(255,255,255,.09);--ln3:rgba(255,255,255,.15);
+  --tx:#cbd2ea;--tx2:#6b7494;--tx3:#35405c;
+  --vi:#5b7cf7;--vi2:rgba(91,124,247,.12);--vi3:rgba(91,124,247,.22);
+  --em:#34d399;--em2:rgba(52,211,153,.11);
+  --am:#f59e0b;--am2:rgba(245,158,11,.11);
+  --re:#f87171;--re2:rgba(248,113,113,.11);
+  --cy:#22d3ee;--cy2:rgba(34,211,238,.11);
+  --or:#a78bfa;--or2:rgba(167,139,250,.11);
+  --pk:#f472b6;--pk2:rgba(244,114,182,.11);
+  --r:10px;--rs:8px;--rx:5px;
+  --sd:0 8px 40px rgba(0,0,0,.6);--sd2:0 2px 12px rgba(0,0,0,.4);
+  --sw:252px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg0);color:var(--tx);font-size:14px;overflow:hidden}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+input,select,button,textarea{font-family:'Inter',sans-serif}
+
+/* ─── LOGIN ─────────────────────────────── */
+#ls{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:999;
+  background:radial-gradient(ellipse 75% 55% at 20% 25%,rgba(91,124,247,.1) 0,transparent 70%),
+             radial-gradient(ellipse 65% 45% at 80% 80%,rgba(52,211,153,.07) 0,transparent 70%),var(--bg0);
+}
+.lc{width:400px;background:var(--bg1);border:1px solid var(--ln2);border-radius:18px;padding:2.4rem;box-shadow:var(--sd);animation:fu .4s cubic-bezier(.22,1,.36,1)}
+@keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.lb{display:flex;align-items:center;gap:10px;margin-bottom:1.8rem}
+.lbi{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--vi),#7c6df7);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:16px;box-shadow:0 4px 18px rgba(91,124,247,.4)}
+.lbt{font-size:19px;font-weight:800;letter-spacing:-.4px}.lbt span{color:var(--vi)}
+.lt{font-size:21px;font-weight:700;letter-spacing:-.4px;margin-bottom:4px}
+.ls2{color:var(--tx2);font-size:13px;margin-bottom:1.6rem}
+.lhi{font-size:11px;color:var(--tx3);text-align:center;margin-top:10px;font-family:'JetBrains Mono',monospace}
+.lerr{background:var(--re2);color:var(--re);border:1px solid rgba(248,113,113,.2);border-radius:var(--rx);padding:8px 12px;font-size:13px;margin-bottom:12px;display:none}
+
+/* ─── FIELD ──────────────────────────────── */
+.f{margin-bottom:12px}
+.f label{display:block;font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.9px;text-transform:uppercase;margin-bottom:5px}
+.f input,.f select{width:100%;background:var(--bg2);border:1px solid var(--ln2);border-radius:var(--rs);padding:10px 13px;font-size:13px;color:var(--tx);transition:border-color .18s,box-shadow .18s}
+.f input:focus,.f select:focus{outline:none;border-color:var(--vi);box-shadow:0 0 0 3px rgba(91,124,247,.14)}
+.f select option{background:var(--bg2)}
+
+/* ─── BTN ────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 17px;border-radius:var(--rs);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .18s;white-space:nowrap}
+.bp{background:linear-gradient(135deg,var(--vi),#7262f5);color:#fff;box-shadow:0 2px 14px rgba(91,124,247,.3)}.bp:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 5px 22px rgba(91,124,247,.4)}
+.bg2{background:transparent;color:var(--tx2);border:1px solid var(--ln2)}.bg2:hover{background:var(--bg3);color:var(--tx)}
+.bem{background:var(--em2);color:var(--em);border:1px solid rgba(52,211,153,.18)}.bem:hover{background:rgba(52,211,153,.2)}
+.bam{background:var(--am2);color:var(--am);border:1px solid rgba(245,158,11,.18)}.bam:hover{background:rgba(245,158,11,.2)}
+.bre{background:var(--re2);color:var(--re);border:1px solid rgba(248,113,113,.18)}.bre:hover{background:rgba(248,113,113,.22)}
+.bsm{padding:5px 10px;font-size:12px;border-radius:6px}
+.bfl{width:100%}
+.ar{display:flex;gap:5px;align-items:center}
+
+/* ─── SHELL ──────────────────────────────── */
+#app{display:none;height:100vh}#app.on{display:flex}
+
+/* ─── SIDEBAR ────────────────────────────── */
+.sb{width:var(--sw);background:var(--bg1);border-right:1px solid var(--ln);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sb-top{padding:17px 15px 8px;display:flex;align-items:center;gap:9px}
+.sb-bi{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--vi),#7c6df7);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:13px}
+.sb-bt{font-size:14px;font-weight:800;letter-spacing:-.3px}.sb-bt span{color:var(--vi)}
+.sb-dv{height:1px;background:var(--ln);margin:6px 0}
+.sb-gr{padding:5px 14px 2px;font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:1.2px;text-transform:uppercase}
+.sb-a{display:flex;align-items:center;gap:9px;padding:8px 11px;margin:1px 7px;border-radius:var(--rs);cursor:pointer;color:var(--tx2);font-size:13px;font-weight:500;transition:all .15s;border:1px solid transparent}
+.sb-a:hover{background:var(--bg2);color:var(--tx)}
+.sb-a.on{background:var(--vi2);color:var(--vi);border-color:var(--vi3)}
+.sb-ic{font-size:14px;width:16px;text-align:center;flex-shrink:0}
+.sb-ct{margin-left:auto;background:var(--bg5);color:var(--tx2);font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;font-family:'JetBrains Mono',monospace}
+.sb-a.on .sb-ct{background:var(--vi3);color:var(--vi)}
+.sb-ft{margin-top:auto;padding:10px 8px;border-top:1px solid var(--ln)}
+.sb-u{display:flex;align-items:center;gap:9px;padding:8px;border-radius:var(--rs);cursor:pointer;transition:background .15s}
+.sb-u:hover{background:var(--bg2)}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.avi{background:var(--vi2);color:var(--vi);border:1px solid var(--vi3)}
+.sb-un{font-size:12px;font-weight:600}.sb-ur{font-size:10px;color:var(--tx3)}
+
+/* ─── MAIN ───────────────────────────────── */
+.mn{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.tb{padding:12px 22px;background:var(--bg1);border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-ti{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.tb-su{font-size:12px;color:var(--tx2);margin-top:1px}
+.tb-dt{font-size:11px;color:var(--tx3);font-family:'JetBrains Mono',monospace}
+.ct{flex:1;overflow-y:auto;padding:20px}
+
+/* ─── PAGE ───────────────────────────────── */
+.pg{display:none;animation:fu .3s ease}
+.pg.on{display:block}
+
+/* ─── STAT GRID ──────────────────────────── */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin-bottom:18px}
+.sc{background:var(--bg1);border:1px solid var(--ln);border-radius:var(--r);padding:15px 17px;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--cc,var(--vi))}
+.sc-t{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.sc-i{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.sc-v{font-size:24px;font-weight:800;letter-spacing:-1px;font-family:'JetBrains Mono',monospace}
+.sc-l{font-size:11px;color:var(--tx2);margin-top:3px;font-weight:500}
+
+/* ─── CARD ───────────────────────────────── */
+.cd{background:var(--bg1);border:1px solid var(--ln);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+.cd-h{padding:13px 17px;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cd-ti{font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px}
+.cd-b{padding:17px}
+.cd-b0{padding:0}
+
+/* ─── TABLE ──────────────────────────────── */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--tx2);background:var(--bg2);border-bottom:1px solid var(--ln);white-space:nowrap}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--ln);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--bg2)}
+
+/* ─── BADGE ──────────────────────────────── */
+.bd{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.2px;white-space:nowrap}
+.bvi{background:var(--vi2);color:var(--vi)}
+.bem2{background:var(--em2);color:var(--em)}
+.bam2{background:var(--am2);color:var(--am)}
+.bre2{background:var(--re2);color:var(--re)}
+.bcy{background:var(--cy2);color:var(--cy)}
+.bor{background:var(--or2);color:var(--or)}
+.bpk{background:var(--pk2);color:var(--pk)}
+
+/* ─── CHIP ───────────────────────────────── */
+.ch{display:inline-flex;align-items:center;justify-content:center;min-width:46px;height:22px;border-radius:11px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;padding:0 7px}
+
+/* ─── MODAL ──────────────────────────────── */
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(5px);z-index:800;display:none;align-items:center;justify-content:center;padding:16px}
+.mo.on{display:flex}
+.mb{background:var(--bg1);border:1px solid var(--ln2);border-radius:16px;width:100%;max-width:540px;box-shadow:var(--sd);animation:fu .28s ease;max-height:90vh;overflow-y:auto}
+.mb-h{padding:17px 20px 13px;border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between}
+.mb-ti{font-size:15px;font-weight:700}
+.mb-b{padding:17px 20px}
+.mb-f{padding:12px 20px;border-top:1px solid var(--ln);display:flex;gap:8px;justify-content:flex-end}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg .s2{grid-column:span 2}
+.mb .f{margin-bottom:0}
+.mb .f input,.mb .f select{background:var(--bg3)}
+
+/* ─── DELETE ─────────────────────────────── */
+.do{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(5px);z-index:900;display:none;align-items:center;justify-content:center}
+.do.on{display:flex}
+.db{background:var(--bg1);border:1px solid rgba(248,113,113,.22);border-radius:14px;padding:24px 24px 18px;width:340px;text-align:center;box-shadow:0 0 50px rgba(248,113,113,.12);animation:fu .28s ease}
+.di{font-size:36px;margin-bottom:10px}
+.dt{font-size:15px;font-weight:700;margin-bottom:4px}
+.ds{font-size:13px;color:var(--tx2);margin-bottom:16px}
+.dr{display:flex;gap:8px;justify-content:center}
+
+/* ─── SEARCH ─────────────────────────────── */
+.sr{position:relative}
+.sr input{background:var(--bg2);border:1px solid var(--ln2);border-radius:var(--rs);padding:7px 11px 7px 30px;font-size:12px;color:var(--tx);width:190px;transition:border-color .18s,width .2s}
+.sr input:focus{outline:none;border-color:var(--vi);width:230px}
+.sr::before{content:'⌕';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--tx3);pointer-events:none}
+
+/* ─── FILTER ─────────────────────────────── */
+.fl{background:var(--bg2);border:1px solid var(--ln2);border-radius:var(--rx);padding:6px 10px;font-size:12px;color:var(--tx2);cursor:pointer}
+.fl:focus{outline:none;border-color:var(--vi);color:var(--tx)}
+.fl option{background:var(--bg2)}
+
+/* ─── TOAST ──────────────────────────────── */
+.ts{position:fixed;bottom:20px;right:20px;background:var(--bg3);border:1px solid var(--ln2);border-radius:var(--rs);padding:10px 15px;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:var(--sd);z-index:9999;transform:translateY(70px);opacity:0;transition:all .28s;max-width:300px}
+.ts.show{transform:translateY(0);opacity:1}
+.ts.ok{border-left:3px solid var(--em)}.ts.er{border-left:3px solid var(--re)}.ts.wa{border-left:3px solid var(--am)}
+
+/* ─── EMPTY ──────────────────────────────── */
+.emp{text-align:center;padding:3rem 2rem;color:var(--tx3);font-size:13px}
+.emp-i{font-size:32px;display:block;margin-bottom:10px;opacity:.25}
+
+/* ─── MISC ───────────────────────────────── */
+.id-tag{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--tx3)}
+.pg-bar{height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;margin-top:6px}
+.pg-bv{height:100%;border-radius:2px;transition:width .4s}
+.tc{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.tc{grid-template-columns:1fr}}
+.fbox{padding:11px 13px;background:var(--bg3);border-radius:var(--rs);border:1px solid var(--ln2);font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--am)}
+.trow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<!-- ══════ LOGIN ══════ -->
+<div id="ls">
+  <div class="lc">
+    <div class="lb">
+      <div class="lbi">EA</div>
+      <div class="lbt">Edu<span>Admin</span></div>
+    </div>
+    <div class="lt">Panneau Administrateur</div>
+    <div class="ls2">Gestion académique centralisée</div>
+    <div class="lerr" id="lerr">Identifiants incorrects.</div>
+    <div class="f"><label>Identifiant</label><input id="lu" type="text" placeholder="admin"/></div>
+    <div class="f"><label>Mot de passe</label><input id="lp" type="password" placeholder="••••••"/></div>
+    <button class="btn bp bfl" style="margin-top:6px" onclick="login()">Accéder au tableau de bord →</button>
+    <div class="lhi">admin / admin123</div>
+  </div>
+</div>
+
+<!-- ══════ APP ══════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <nav class="sb">
+    <div class="sb-top">
+      <div class="sb-bi">EA</div>
+      <div class="sb-bt">Edu<span>Admin</span></div>
+    </div>
+    <div class="sb-dv"></div>
+    <div class="sb-gr">Principal</div>
+    <div class="sb-a on" onclick="go('dashboard',this)"><span class="sb-ic">⬡</span>Dashboard</div>
+    <div class="sb-gr">Académique</div>
+    <div class="sb-a" onclick="go('etudiants',this)"><span class="sb-ic">🎓</span>Étudiants<span class="sb-ct" id="c-e">0</span></div>
+    <div class="sb-a" onclick="go('enseignants',this)"><span class="sb-ic">👨‍🏫</span>Enseignants<span class="sb-ct" id="c-n">0</span></div>
+    <div class="sb-a" onclick="go('modules',this)"><span class="sb-ic">📚</span>Modules<span class="sb-ct" id="c-m">0</span></div>
+    <div class="sb-a" onclick="go('inscriptions',this)"><span class="sb-ic">📋</span>Inscriptions<span class="sb-ct" id="c-i">0</span></div>
+    <div class="sb-a" onclick="go('notes',this)"><span class="sb-ic">📝</span>Notes<span class="sb-ct" id="c-nt">0</span></div>
+    <div class="sb-gr">Système</div>
+    <div class="sb-a" onclick="go('users',this)"><span class="sb-ic">🔐</span>Utilisateurs<span class="sb-ct" id="c-u">0</span></div>
+    <div class="sb-ft">
+      <div class="sb-u" onclick="logout()">
+        <div class="av avi">AD</div>
+        <div><div class="sb-un">Administrateur</div><div class="sb-ur">Super Admin · Quitter →</div></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="mn">
+    <div class="tb">
+      <div><div class="tb-ti" id="pt">Dashboard</div><div class="tb-su" id="ps">Vue d'ensemble du système</div></div>
+      <div class="tb-dt" id="dt"></div>
+    </div>
+    <div class="ct">
+
+      <!-- ── DASHBOARD ── -->
+      <div class="pg on" id="pg-dashboard">
+        <div class="sg" id="d-sg"></div>
+        <div class="tc">
+          <div class="cd"><div class="cd-h"><div class="cd-ti">📊 Répartition filières</div></div><div class="cd-b" id="d-fil"></div></div>
+          <div class="cd"><div class="cd-h"><div class="cd-ti">📅 Modules / Semestre</div></div><div class="cd-b" id="d-sem"></div></div>
+        </div>
+        <div class="cd"><div class="cd-h"><div class="cd-ti">🕒 Dernières notes saisies</div></div><div class="cd-b0 tw" id="d-ln"></div></div>
+      </div>
+
+      <!-- ── ÉTUDIANTS ── -->
+      <div class="pg" id="pg-etudiants">
+        <div class="cd">
+          <div class="cd-h">
+            <div class="cd-ti">🎓 Gestion des Étudiants</div>
+            <div class="trow">
+              <div class="sr"><input id="se" placeholder="Rechercher…" oninput="rE()"/></div>
+              <select class="fl" id="fe-f" onchange="rE()"><option value="">Toutes filières</option><option>Informatique</option><option>Mathématiques</option><option>Physique</option><option>Chimie</option><option>Biologie</option><option>Économie</option></select>
+              <select class="fl" id="fe-a" onchange="rE()"><option value="">Toutes années</option><option>L1</option><option>L2</option><option>L3</option><option>M1</option><option>M2</option></select>
+              <button class="btn bem bsm" onclick="openM('me')">＋ Ajouter</button>
+            </div>
+          </div>
+          <div class="cd-b0 tw"><div id="te"></div></div>
+        </div>
+      </div>
+
+      <!-- ── ENSEIGNANTS ── -->
+      <div class="pg" id="pg-enseignants">
+        <div class="cd">
+          <div class="cd-h">
+            <div class="cd-ti">👨‍🏫 Gestion des Enseignants</div>
+            <div class="trow">
+              <div class="sr"><input id="sn" placeholder="Rechercher…" oninput="rN()"/></div>
+              <button class="btn bem bsm" onclick="openM('mn')">＋ Ajouter</button>
+            </div>
+          </div>
+          <div class="cd-b0 tw"><div id="tn"></div></div>
+        </div>
+      </div>
+
+      <!-- ── MODULES ── -->
+      <div class="pg" id="pg-modules">
+        <div class="cd">
+          <div class="cd-h">
+            <div class="cd-ti">📚 Gestion des Modules</div>
+            <div class="trow">
+              <div class="sr"><input id="sm" placeholder="Rechercher…" oninput="rM()"/></div>
+              <select class="fl" id="fm-s" onchange="rM()"><option value="">Tous semestres</option><option>S1</option><option>S2</option><option>S3</option><option>S4</option><option>S5</option><option>S6</option></select>
+              <button class="btn bem bsm" onclick="openM('mm')">＋ Ajouter</button>
+            </div>
+          </div>
+          <div class="cd-b0 tw"><div id="tm"></div></div>
+        </div>
+      </div>
+
+      <!-- ── INSCRIPTIONS ── -->
+      <div class="pg" id="pg-inscriptions">
+        <div class="cd">
+          <div class="cd-h">
+            <div class="cd-ti">📋 Inscriptions aux modules</div>
+            <div class="trow">
+              <select class="fl" id="fi-m" onchange="rI()"><option value="">Tous modules</option></select>
+              <button class="btn bem bsm" onclick="openM('mi')">＋ Inscrire</button>
+            </div>
+          </div>
+          <div class="cd-b0 tw"><div id="ti"></div></div>
+        </div>
+      </div>
+
+      <!-- ── NOTES ── -->
+      <div class="pg" id="pg-notes">
+        <div class="cd">
+          <div class="cd-h">
+            <div class="cd-ti">📝 Notes &nbsp;<span class="bd bam2" style="font-size:10px">MongoDB</span></div>
+            <div class="trow">
+              <select class="fl" id="fn-m" onchange="rNt()"><option value="">Tous modules</option></select>
+              <select class="fl" id="fn-s" onchange="rNt()"><option value="">Toutes sessions</option><option>Normale</option><option>Rattrapage</option></select>
+              <button class="btn bem bsm" onclick="openM('mnt')">＋ Saisir note</button>
+            </div>
+          </div>
+          <div class="cd-b0 tw"><div id="tnt"></div></div>
+        </div>
+      </div>
+
+      <!-- ── USERS ── -->
+      <div class="pg" id="pg-users">
+        <div class="cd">
+          <div class="cd-h">
+            <div class="cd-ti">🔐 Utilisateurs du système</div>
+            <div class="trow">
+              <div class="sr"><input id="su" placeholder="Rechercher…" oninput="rU()"/></div>
+              <select class="fl" id="fu-r" onchange="rU()"><option value="">Tous rôles</option><option>admin</option><option>enseignant</option><option>etudiant</option></select>
+              <button class="btn bem bsm" onclick="openM('mu')">＋ Créer compte</button>
+            </div>
+          </div>
+          <div class="cd-b0 tw"><div id="tu"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ══════ MODALS ══════ -->
+
+<!-- Étudiant -->
+<div class="mo" id="mo-me">
+  <div class="mb">
+    <div class="mb-h"><div class="mb-ti" id="ti-me">Ajouter un Étudiant</div><button class="btn bg2 bsm" onclick="closeM('me')">✕</button></div>
+    <div class="mb-b"><input type="hidden" id="me-id"/>
+      <div class="fg">
+        <div class="f"><label>Nom</label><input id="me-no" placeholder="Alami"/></div>
+        <div class="f"><label>Prénom</label><input id="me-pr" placeholder="Yassine"/></div>
+        <div class="f s2"><label>Email</label><input id="me-em" placeholder="y.alami@univ.ma" type="email"/></div>
+        <div class="f"><label>Filière</label>
+          <select id="me-fi"><option>Informatique</option><option>Mathématiques</option><option>Physique</option><option>Chimie</option><option>Biologie</option><option>Économie</option></select>
+        </div>
+        <div class="f"><label>Année</label>
+          <select id="me-an"><option>L1</option><option>L2</option><option>L3</option><option>M1</option><option>M2</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="mb-f"><button class="btn bg2" onclick="closeM('me')">Annuler</button><button class="btn bp" onclick="svE()">Enregistrer</button></div>
+  </div>
+</div>
+
+<!-- Enseignant -->
+<div class="mo" id="mo-mn">
+  <div class="mb">
+    <div class="mb-h"><div class="mb-ti" id="ti-mn">Ajouter un Enseignant</div><button class="btn bg2 bsm" onclick="closeM('mn')">✕</button></div>
+    <div class="mb-b"><input type="hidden" id="mn-id"/>
+      <div class="fg">
+        <div class="f"><label>Nom</label><input id="mn-no" placeholder="Benali"/></div>
+        <div class="f"><label>Prénom</label><input id="mn-pr" placeholder="Sara"/></div>
+        <div class="f s2"><label>Email</label><input id="mn-em" placeholder="s.benali@univ.ma" type="email"/></div>
+        <div class="f s2"><label>Spécialité</label><input id="mn-sp" placeholder="Algorithmique & IA"/></div>
+      </div>
+    </div>
+    <div class="mb-f"><button class="btn bg2" onclick="closeM('mn')">Annuler</button><button class="btn bp" onclick="svN()">Enregistrer</button></div>
+  </div>
+</div>
+
+<!-- Module -->
+<div class="mo" id="mo-mm">
+  <div class="mb">
+    <div class="mb-h"><div class="mb-ti" id="ti-mm">Ajouter un Module</div><button class="btn bg2 bsm" onclick="closeM('mm')">✕</button></div>
+    <div class="mb-b"><input type="hidden" id="mm-id"/>
+      <div class="fg">
+        <div class="f s2"><label>Intitulé</label><input id="mm-it" placeholder="Algorithmique Avancée"/></div>
+        <div class="f"><label>Coefficient</label><input id="mm-co" type="number" min="1" max="10" placeholder="3"/></div>
+        <div class="f"><label>Semestre</label><select id="mm-se"><option>S1</option><option>S2</option><option>S3</option><option>S4</option><option>S5</option><option>S6</option></select></div>
+        <div class="f s2"><label>Date de clôture</label><input id="mm-cl" type="date"/></div>
+        <div class="f s2"><label>Enseignant responsable</label><select id="mm-en"><option value="">— Sélectionner —</option></select></div>
+      </div>
+    </div>
+    <div class="mb-f"><button class="btn bg2" onclick="closeM('mm')">Annuler</button><button class="btn bp" onclick="svM()">Enregistrer</button></div>
+  </div>
+</div>
+
+<!-- Inscription -->
+<div class="mo" id="mo-mi">
+  <div class="mb">
+    <div class="mb-h"><div class="mb-ti">Nouvelle Inscription</div><button class="btn bg2 bsm" onclick="closeM('mi')">✕</button></div>
+    <div class="mb-b">
+      <div class="fg">
+        <div class="f s2"><label>Étudiant</label><select id="mi-et"><option value="">— Sélectionner —</option></select></div>
+        <div class="f s2"><label>Module</label><select id="mi-mo"><option value="">— Sélectionner —</option></select></div>
+      </div>
+    </div>
+    <div class="mb-f"><button class="btn bg2" onclick="closeM('mi')">Annuler</button><button class="btn bp" onclick="svI()">Inscrire</button></div>
+  </div>
+</div>
+
+<!-- Note -->
+<div class="mo" id="mo-mnt">
+  <div class="mb">
+    <div class="mb-h"><div class="mb-ti" id="ti-mnt">Saisir une Note</div><button class="btn bg2 bsm" onclick="closeM('mnt')">✕</button></div>
+    <div class="mb-b"><input type="hidden" id="mnt-id"/>
+      <div class="fg">
+        <div class="f s2"><label>Étudiant</label><select id="mnt-et"><option value="">— Sélectionner —</option></select></div>
+        <div class="f s2"><label>Module</label><select id="mnt-mo"><option value="">— Sélectionner —</option></select></div>
+        <div class="f"><label>TP /20</label><input id="mnt-tp" type="number" min="0" max="20" step=".5" placeholder="—"/></div>
+        <div class="f"><label>Contrôle Continu /20</label><input id="mnt-cc" type="number" min="0" max="20" step=".5" placeholder="—"/></div>
+        <div class="f"><label>Examen /20</label><input id="mnt-ex" type="number" min="0" max="20" step=".5" placeholder="—"/></div>
+        <div class="f"><label>Session</label><select id="mnt-se"><option>Normale</option><option>Rattrapage</option></select></div>
+        <div class="f s2"><label>Date de saisie</label><input id="mnt-da" type="date"/></div>
+      </div>
+      <div class="fbox" style="margin-top:13px">Moy = TP×20% + CC×30% + Examen×50%</div>
+    </div>
+    <div class="mb-f"><button class="btn bg2" onclick="closeM('mnt')">Annuler</button><button class="btn bp" onclick="svNt()">Enregistrer</button></div>
+  </div>
+</div>
+
+<!-- User -->
+<div class="mo" id="mo-mu">
+  <div class="mb">
+    <div class="mb-h"><div class="mb-ti" id="ti-mu">Créer un compte</div><button class="btn bg2 bsm" onclick="closeM('mu')">✕</button></div>
+    <div class="mb-b"><input type="hidden" id="mu-id"/>
+      <div class="fg">
+        <div class="f s2"><label>Nom d'utilisateur</label><input id="mu-un" placeholder="j.dupont"/></div>
+        <div class="f s2"><label>Mot de passe</label><input id="mu-pw" type="password" placeholder="Laisser vide = inchangé"/></div>
+        <div class="f s2"><label>Rôle</label><select id="mu-ro"><option value="admin">Admin</option><option value="enseignant">Enseignant</option><option value="etudiant">Étudiant</option></select></div>
+      </div>
+    </div>
+    <div class="mb-f"><button class="btn bg2" onclick="closeM('mu')">Annuler</button><button class="btn bp" onclick="svU()">Enregistrer</button></div>
+  </div>
+</div>
+
+<!-- Delete confirm -->
+<div class="do" id="do">
+  <div class="db">
+    <div class="di">🗑️</div>
+    <div class="dt">Confirmer la suppression</div>
+    <div class="ds" id="do-s">Action irréversible.</div>
+    <div class="dr">
+      <button class="btn bg2" onclick="clDel()">Annuler</button>
+      <button class="btn bre" onclick="confDel()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<div class="ts" id="ts"></div>
+
+<script>
+/* ════════════════ DATA ════════════════ */
+const D={
+  e:[/* étudiants */
+    {id:'E001',nom:'Alami',prenom:'Yassine',email:'y.alami@univ.ma',filiere:'Informatique',annee:'L3'},
+    {id:'E002',nom:'El Fassi',prenom:'Fatima',email:'f.elfassi@univ.ma',filiere:'Mathématiques',annee:'L2'},
+    {id:'E003',nom:'Ouali',prenom:'Mehdi',email:'m.ouali@univ.ma',filiere:'Physique',annee:'L2'},
+    {id:'E004',nom:'Ziani',prenom:'Amira',email:'a.ziani@univ.ma',filiere:'Informatique',annee:'M1'},
+    {id:'E005',nom:'Benhaddou',prenom:'Karim',email:'k.benhaddou@univ.ma',filiere:'Chimie',annee:'L1'},
+    {id:'E006',nom:'Moussaoui',prenom:'Nadia',email:'n.moussaoui@univ.ma',filiere:'Biologie',annee:'L3'},
+  ],
+  n:[/* enseignants */
+    {id:'EN001',nom:'Benali',prenom:'Sara',email:'s.benali@univ.ma',specialite:'Algorithmique & IA'},
+    {id:'EN002',nom:'Martin',prenom:'Paul',email:'p.martin@univ.ma',specialite:'Mathématiques Appliquées'},
+    {id:'EN003',nom:'Chakir',prenom:'Ahmed',email:'a.chakir@univ.ma',specialite:'Physique Quantique'},
+    {id:'EN004',nom:'Berrada',prenom:'Leila',email:'l.berrada@univ.ma',specialite:'Biochimie'},
+  ],
+  m:[/* modules */
+    {id:'M001',intitule:'Algorithmique Avancée',coefficient:3,semestre:'S5',dateCloture:'2025-01-31',enseignantId:'EN001'},
+    {id:'M002',intitule:'Analyse Numérique',coefficient:2,semestre:'S3',dateCloture:'2025-01-31',enseignantId:'EN002'},
+    {id:'M003',intitule:'Mécanique Quantique',coefficient:4,semestre:'S5',dateCloture:'2025-02-15',enseignantId:'EN003'},
+    {id:'M004',intitule:'Programmation Web',coefficient:2,semestre:'S4',dateCloture:'2025-01-20',enseignantId:'EN001'},
+    {id:'M005',intitule:'Biochimie Structurale',coefficient:3,semestre:'S6',dateCloture:'2025-03-01',enseignantId:'EN004'},
+  ],
+  i:[/* inscriptions */
+    {id:'I001',etudiantId:'E001',moduleId:'M001'},
+    {id:'I002',etudiantId:'E001',moduleId:'M002'},
+    {id:'I003',etudiantId:'E002',moduleId:'M001'},
+    {id:'I004',etudiantId:'E003',moduleId:'M003'},
+    {id:'I005',etudiantId:'E004',moduleId:'M004'},
+    {id:'I006',etudiantId:'E005',moduleId:'M002'},
+  ],
+  nt:[/* notes MongoDB */
+    {id:'N001',etudiantId:'E001',moduleId:'M001',tp:15,controleContinu:16,examen:17,session:'Normale',dateSaisie:'2025-01-10'},
+    {id:'N002',etudiantId:'E001',moduleId:'M002',tp:12,controleContinu:13,examen:11,session:'Normale',dateSaisie:'2025-01-11'},
+    {id:'N003',etudiantId:'E002',moduleId:'M001',tp:8,controleContinu:9,examen:7,session:'Rattrapage',dateSaisie:'2025-01-12'},
+    {id:'N004',etudiantId:'E003',moduleId:'M003',tp:14,controleContinu:15,examen:16,session:'Normale',dateSaisie:'2025-01-13'},
+    {id:'N005',etudiantId:'E004',moduleId:'M004',tp:18,controleContinu:19,examen:20,session:'Normale',dateSaisie:'2025-01-14'},
+    {id:'N006',etudiantId:'E005',moduleId:'M002',tp:6,controleContinu:7,examen:5,session:'Rattrapage',dateSaisie:'2025-01-15'},
+  ],
+  u:[/* users */
+    {id:'U001',username:'admin',password:'admin123',role:'admin'},
+    {id:'U002',username:'prof.benali',password:'1234',role:'enseignant'},
+    {id:'U003',username:'y.alami',password:'etu123',role:'etudiant'},
+    {id:'U004',username:'f.elfassi',password:'etu456',role:'etudiant'},
+  ],
+};
+const CTR={E:7,EN:5,M:6,I:7,N:7,U:5};
+function nid(p){return p+String(CTR[p]++).padStart(3,'0')}
+let pDel=null;
+
+/* ════════════════ UTILS ════════════════ */
+const $=id=>document.getElementById(id);
+const vl=id=>$(id).value.trim();
+const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:null;
+function toast(msg,t='ok'){const e=$('ts');e.textContent=({ok:'✓ ',er:'✗ ',wa:'⚠ '}[t]||'')+msg;e.className='ts show '+t;setTimeout(()=>e.className='ts',3000)}
+function openM(k){pops();$('mo-m'+k).classList.add('on')}
+function closeM(k){$('mo-m'+k).classList.remove('on')}
+function opDel(type,id,lbl){pDel={type,id};$('do-s').textContent='Supprimer : '+lbl;$('do').classList.add('on')}
+function clDel(){pDel=null;$('do').classList.remove('on')}
+function confDel(){
+  if(!pDel)return;
+  const mp={e:'e',n:'n',m:'m',i:'i',nt:'nt',u:'u'};
+  if(mp[pDel.type])D[mp[pDel.type]]=D[mp[pDel.type]].filter(x=>x.id!==pDel.id);
+  clDel();updCnt();rDash();rE();rN();rM();rI();rNt();rU();pops();
+  toast('Supprimé.','wa');
+}
+function clr(...ids){ids.forEach(id=>{const e=$(id);if(e)e.tagName==='SELECT'?e.selectedIndex=0:e.value=''})}
+function ini(a,b){return((a||'')[0]||'').toUpperCase()+((b||'')[0]||'').toUpperCase()}
+function eName(id){const e=D.n.find(x=>x.id===id);return e?e.nom+' '+e.prenom:'—'}
+function etName(id){const e=D.e.find(x=>x.id===id);return e?e.nom+' '+e.prenom:'—'}
+function mName(id){const m=D.m.find(x=>x.id===id);return m?m.intitule:'—'}
+function moy(n){return((+n.tp*.2)+(+n.controleContinu*.3)+(+n.examen*.5)).toFixed(2)}
+function ment(v){return v>=16?'Très bien':v>=14?'Bien':v>=12?'Assez bien':v>=10?'Passable':'Insuffisant'}
+function nC(v){return v>=14?'bem2':v>=10?'bvi':v>=8?'bam2':'bre2'}
+function rC(r){return r==='admin'?'bre2':r==='enseignant'?'bvi':'bem2'}
+function sC(s){return{S1:'bcy',S2:'bcy',S3:'bor',S4:'bor',S5:'bvi',S6:'bpk'}[s]||'bvi'}
+function fC(f){return{Informatique:'bvi',Mathématiques:'bor',Physique:'bcy',Chimie:'bam2',Biologie:'bem2',Économie:'bre2'}[f]||'bvi'}
+function emp(m='Aucune donnée'){return`<div class="emp"><span class="emp-i">📭</span>${m}</div>`}
+
+/* ════════ COUNTS ════════ */
+function updCnt(){
+  $('c-e').textContent=D.e.length;$('c-n').textContent=D.n.length;
+  $('c-m').textContent=D.m.length;$('c-i').textContent=D.i.length;
+  $('c-nt').textContent=D.nt.length;$('c-u').textContent=D.u.length;
+}
+
+/* ════════ POPULATE ════════ */
+function pops(){
+  const eO=D.e.map(e=>`<option value="${e.id}">${e.nom} ${e.prenom} (${e.id})</option>`).join('');
+  const mO=D.m.map(m=>`<option value="${m.id}">${m.intitule} — ${m.semestre}</option>`).join('');
+  const nO=D.n.map(n=>`<option value="${n.id}">${n.nom} ${n.prenom}</option>`).join('');
+  function so(id,base,opts){const s=$(id);if(!s)return;const v=s.value;s.innerHTML=base+opts;s.value=v}
+  so('mi-et','<option value="">— Sélectionner —</option>',eO);
+  so('mi-mo','<option value="">— Sélectionner —</option>',mO);
+  so('mnt-et','<option value="">— Sélectionner —</option>',eO);
+  so('mnt-mo','<option value="">— Sélectionner —</option>',mO);
+  so('mm-en','<option value="">— Sélectionner —</option>',nO);
+  so('fi-m','<option value="">Tous modules</option>',mO);
+  so('fn-m','<option value="">Tous modules</option>',mO);
+}
+
+/* ════════ AUTH ════════ */
+function login(){
+  const u=vl('lu'),p=vl('lp'),err=$('lerr');
+  if(u==='admin'&&p==='admin123'){
+    err.style.display='none';
+    $('ls').style.display='none';
+    $('app').classList.add('on');
+    $('dt').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    updCnt();pops();rDash();rE();rN();rM();rI();rNt();rU();
+  }else err.style.display='block';
+}
+function logout(){$('app').classList.remove('on');$('ls').style.display='flex';$('lu').value='';$('lp').value=''}
+['lu','lp'].forEach(id=>$(id).addEventListener('keydown',e=>e.key==='Enter'&&login()));
+
+/* ════════ NAV ════════ */
+const TITLES={dashboard:'Dashboard',etudiants:'Étudiants',enseignants:'Enseignants',modules:'Modules',inscriptions:'Inscriptions',notes:'Notes',users:'Utilisateurs'};
+const SUBS={dashboard:"Vue d'ensemble du système",etudiants:'Ajouter, modifier, supprimer des étudiants',enseignants:'Gérer le corps enseignant',modules:"Gérer les modules d'enseignement",inscriptions:'Inscriptions des étudiants aux modules',notes:'Saisir et gérer les notes — MongoDB',users:'Comptes et accès système'};
+function go(page,el){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.sb-a').forEach(a=>a.classList.remove('on'));
+  $('pg-'+page).classList.add('on');
+  if(el)el.classList.add('on');
+  $('pt').textContent=TITLES[page]||page;
+  $('ps').textContent=SUBS[page]||'';
+}
+
+/* ════════ DASHBOARD ════════ */
+function rDash(){
+  const mvs=D.nt.map(n=>parseFloat(moy(n)));
+  const mg=avg(mvs),reuss=mvs.filter(v=>v>=10).length;
+  const cc={e:'--vi',n:'--em',m:'--or',i:'--am',nt:'--am',u:'--cy'};
+  $('d-sg').innerHTML=`
+    <div class="sc" style="--cc:var(--vi)"><div class="sc-t"><div class="sc-i" style="background:var(--vi2)">🎓</div><span class="bd bvi">${D.e.length}</span></div><div class="sc-v" style="color:var(--vi)">${D.e.length}</div><div class="sc-l">Étudiants</div></div>
+    <div class="sc" style="--cc:var(--em)"><div class="sc-t"><div class="sc-i" style="background:var(--em2)">👨‍🏫</div><span class="bd bem2">Actifs</span></div><div class="sc-v" style="color:var(--em)">${D.n.length}</div><div class="sc-l">Enseignants</div></div>
+    <div class="sc" style="--cc:var(--or)"><div class="sc-t"><div class="sc-i" style="background:var(--or2)">📚</div><span class="bd bor">${D.m.length} UE</span></div><div class="sc-v" style="color:var(--or)">${D.m.length}</div><div class="sc-l">Modules</div></div>
+    <div class="sc" style="--cc:var(--am)"><div class="sc-t"><div class="sc-i" style="background:var(--am2)">📝</div><span class="bd bam2">MongoDB</span></div><div class="sc-v" style="color:var(--am)">${D.nt.length}</div><div class="sc-l">Notes saisies</div></div>
+    <div class="sc" style="--cc:var(--em)"><div class="sc-t"><div class="sc-i" style="background:var(--em2)">✅</div></div><div class="sc-v" style="color:var(--em)">${D.nt.length?Math.round(reuss/D.nt.length*100):0}%</div><div class="sc-l">Taux de réussite</div></div>
+    <div class="sc" style="--cc:var(--cy)"><div class="sc-t"><div class="sc-i" style="background:var(--cy2)">📊</div></div><div class="sc-v" style="color:var(--cy)">${mg?mg.toFixed(2):'—'}</div><div class="sc-l">Moyenne générale /20</div></div>
+  `;
+  const fc={Informatique:'var(--vi)',Mathématiques:'var(--or)',Physique:'var(--cy)',Chimie:'var(--am)',Biologie:'var(--em)',Économie:'var(--re)'};
+  const fil={};D.e.forEach(e=>{fil[e.filiere]=(fil[e.filiere]||0)+1});
+  $('d-fil').innerHTML=Object.entries(fil).map(([f,c])=>`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px">
+        <span style="font-weight:500">${f}</span>
+        <span style="color:var(--tx2);font-family:'JetBrains Mono',monospace">${c}</span>
+      </div>
+      <div class="pg-bar"><div class="pg-bv" style="width:${Math.round(c/D.e.length*100)}%;background:${fc[f]||'var(--vi)'}"></div></div>
+    </div>`).join('')||emp();
+  const sem={};D.m.forEach(m=>{sem[m.semestre]=(sem[m.semestre]||0)+1});
+  $('d-sem').innerHTML=Object.entries(sem).sort().map(([s,c])=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--ln)">
+      <div style="display:flex;align-items:center;gap:9px"><span class="bd ${sC(s)}">${s}</span><span style="font-size:13px">${c} module(s)</span></div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tx2)">${c}</span>
+    </div>`).join('')||emp();
+  const last=[...D.nt].reverse().slice(0,5);
+  $('d-ln').innerHTML=last.length?`<table>
+    <thead><tr><th>Étudiant</th><th>Module</th><th>TP</th><th>CC</th><th>Exam.</th><th>Moyenne</th><th>Mention</th><th>Session</th><th>Date</th></tr></thead>
+    <tbody>${last.map(n=>{const mv=parseFloat(moy(n));return`<tr>
+      <td style="font-weight:600">${etName(n.etudiantId)}</td>
+      <td style="color:var(--tx2);font-size:12px">${mName(n.moduleId)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${n.tp}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${n.controleContinu}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${n.examen}</td>
+      <td><span class="ch ${nC(mv)}">${mv}/20</span></td>
+      <td><span class="bd ${nC(mv)}">${ment(mv)}</span></td>
+      <td><span class="bd ${n.session==='Normale'?'bem2':'bam2'}">${n.session}</span></td>
+      <td style="color:var(--tx3);font-family:'JetBrains Mono',monospace;font-size:11px">${n.dateSaisie}</td>
+    </tr>`}).join('')}</tbody></table>`:emp('Aucune note saisie');
+}
+
+/* ════════ ÉTUDIANTS CRUD ════════ */
+function rE(){
+  const q=(($('se')||{}).value||'').toLowerCase();
+  const ff=($('fe-f')||{}).value||'',fa=($('fe-a')||{}).value||'';
+  const data=D.e.filter(e=>{
+    const ok=(e.nom+' '+e.prenom+' '+e.email).toLowerCase().includes(q);
+    return ok&&(!ff||e.filiere===ff)&&(!fa||e.annee===fa);
+  });
+  $('te').innerHTML=data.length?`<table>
+    <thead><tr><th>ID</th><th>Nom complet</th><th>Email</th><th>Filière</th><th>Année</th><th>Moy.</th><th>Actions</th></tr></thead>
+    <tbody>${data.map(e=>{
+      const ns=D.nt.filter(n=>n.etudiantId===e.id).map(n=>parseFloat(moy(n)));
+      const mv=avg(ns);
+      return`<tr>
+        <td><span class="id-tag">${e.id}</span></td>
+        <td><div style="display:flex;align-items:center;gap:8px">
+          <div class="av" style="background:var(--vi2);color:var(--vi);border:1px solid var(--vi3);font-size:10px">${ini(e.nom,e.prenom)}</div>
+          <div><div style="font-weight:600">${e.nom} ${e.prenom}</div></div>
+        </div></td>
+        <td style="color:var(--tx2);font-size:12px">${e.email}</td>
+        <td><span class="bd ${fC(e.filiere)}">${e.filiere}</span></td>
+        <td><span class="bd bcy">${e.annee}</span></td>
+        <td>${mv!==null?`<span class="ch ${nC(mv)}">${mv.toFixed(1)}</span>`:'<span style="color:var(--tx3);font-size:12px">—</span>'}</td>
+        <td><div class="ar">
+          <button class="btn bam bsm" onclick="edE('${e.id}')">✏️ Modifier</button>
+          <button class="btn bre bsm" onclick="opDel('e','${e.id}','${e.nom} ${e.prenom}')">🗑</button>
+        </div></td>
+      </tr>`;}).join('')}
+    </tbody></table>`:emp('Aucun étudiant trouvé');
+}
+function edE(id){
+  const e=D.e.find(x=>x.id===id);if(!e)return;
+  $('ti-me').textContent="Modifier l'Étudiant";
+  $('me-id').value=id;$('me-no').value=e.nom;$('me-pr').value=e.prenom;
+  $('me-em').value=e.email;$('me-fi').value=e.filiere;$('me-an').value=e.annee;
+  openM('e');
+}
+function svE(){
+  const id=$('me-id').value;
+  const nom=vl('me-no'),prenom=vl('me-pr'),email=vl('me-em'),filiere=$('me-fi').value,annee=$('me-an').value;
+  if(!nom||!prenom||!email){toast('Remplissez tous les champs.','er');return}
+  if(id){const e=D.e.find(x=>x.id===id);if(e)Object.assign(e,{nom,prenom,email,filiere,annee});toast('Étudiant modifié !')}
+  else{D.e.push({id:nid('E'),nom,prenom,email,filiere,annee});toast('Étudiant ajouté !')}
+  $('ti-me').textContent='Ajouter un Étudiant';$('me-id').value='';
+  clr('me-no','me-pr','me-em');closeM('e');updCnt();rE();rDash();pops();
+}
+
+/* ════════ ENSEIGNANTS CRUD ════════ */
+function rN(){
+  const q=(($('sn')||{}).value||'').toLowerCase();
+  const data=D.n.filter(e=>(e.nom+' '+e.prenom+' '+e.email+' '+e.specialite).toLowerCase().includes(q));
+  $('tn').innerHTML=data.length?`<table>
+    <thead><tr><th>ID</th><th>Nom complet</th><th>Email</th><th>Spécialité</th><th>Modules</th><th>Actions</th></tr></thead>
+    <tbody>${data.map(e=>{
+      const mc=D.m.filter(m=>m.enseignantId===e.id).length;
+      return`<tr>
+        <td><span class="id-tag">${e.id}</span></td>
+        <td><div style="display:flex;align-items:center;gap:8px">
+          <div class="av" style="background:var(--em2);color:var(--em);border:1px solid rgba(52,211,153,.2);font-size:10px">${ini(e.nom,e.prenom)}</div>
+          <div style="font-weight:600">${e.nom} ${e.prenom}</div>
+        </div></td>
+        <td style="color:var(--tx2);font-size:12px">${e.email}</td>
+        <td style="color:var(--tx2);font-size:12px">${e.specialite}</td>
+        <td><span class="bd bvi" style="font-family:'JetBrains Mono',monospace">${mc}</span></td>
+        <td><div class="ar">
+          <button class="btn bam bsm" onclick="edN('${e.id}')">✏️ Modifier</button>
+          <button class="btn bre bsm" onclick="opDel('n','${e.id}','${e.nom} ${e.prenom}')">🗑</button>
+        </div></td>
+      </tr>`;}).join('')}
+    </tbody></table>`:emp();
+}
+function edN(id){
+  const e=D.n.find(x=>x.id===id);if(!e)return;
+  $('ti-mn').textContent="Modifier l'Enseignant";
+  $('mn-id').value=id;$('mn-no').value=e.nom;$('mn-pr').value=e.prenom;
+  $('mn-em').value=e.email;$('mn-sp').value=e.specialite;
+  openM('n');
+}
+function svN(){
+  const id=$('mn-id').value;
+  const nom=vl('mn-no'),prenom=vl('mn-pr'),email=vl('mn-em'),specialite=vl('mn-sp');
+  if(!nom||!prenom||!email){toast('Remplissez tous les champs.','er');return}
+  if(id){const e=D.n.find(x=>x.id===id);if(e)Object.assign(e,{nom,prenom,email,specialite});toast('Enseignant modifié !')}
+  else{D.n.push({id:nid('EN'),nom,prenom,email,specialite});toast('Enseignant ajouté !')}
+  $('ti-mn').textContent='Ajouter un Enseignant';$('mn-id').value='';
+  clr('mn-no','mn-pr','mn-em','mn-sp');closeM('n');updCnt();rN();rDash();pops();
+}
+
+/* ════════ MODULES CRUD ════════ */
+function rM(){
+  const q=(($('sm')||{}).value||'').toLowerCase();
+  const fs=($('fm-s')||{}).value||'';
+  const data=D.m.filter(m=>(m.intitule+' '+m.id).toLowerCase().includes(q)&&(!fs||m.semestre===fs));
+  const today=new Date();
+  $('tm').innerHTML=data.length?`<table>
+    <thead><tr><th>ID</th><th>Intitulé</th><th>Sem.</th><th>Coeff.</th><th>Enseignant</th><th>Clôture</th><th>Statut</th><th>Actions</th></tr></thead>
+    <tbody>${data.map(m=>{
+      const cl=m.dateCloture&&new Date(m.dateCloture)<today;
+      return`<tr>
+        <td><span class="id-tag">${m.id}</span></td>
+        <td style="font-weight:600">${m.intitule}</td>
+        <td><span class="bd ${sC(m.semestre)}">${m.semestre}</span></td>
+        <td><span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--am)">${m.coefficient}</span></td>
+        <td style="font-size:12px;color:var(--tx2)">${eName(m.enseignantId)}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tx2)">${m.dateCloture||'—'}</td>
+        <td><span class="bd ${cl?'bre2':'bem2'}">${cl?'Clôturé':'Ouvert'}</span></td>
+        <td><div class="ar">
+          <button class="btn bam bsm" onclick="edM('${m.id}')">✏️ Modifier</button>
+          <button class="btn bre bsm" onclick="opDel('m','${m.id}','${m.intitule}')">🗑</button>
+        </div></td>
+      </tr>`;}).join('')}
+    </tbody></table>`:emp();
+}
+function edM(id){
+  const m=D.m.find(x=>x.id===id);if(!m)return;
+  pops();
+  $('ti-mm').textContent='Modifier le Module';
+  $('mm-id').value=id;$('mm-it').value=m.intitule;$('mm-co').value=m.coefficient;
+  $('mm-se').value=m.semestre;$('mm-cl').value=m.dateCloture||'';$('mm-en').value=m.enseignantId||'';
+  openM('m');
+}
+function svM(){
+  const id=$('mm-id').value;
+  const intitule=vl('mm-it'),coefficient=parseInt($('mm-co').value)||1;
+  const semestre=$('mm-se').value,dateCloture=$('mm-cl').value,enseignantId=$('mm-en').value;
+  if(!intitule){toast("Saisissez l'intitulé.",'er');return}
+  if(id){const m=D.m.find(x=>x.id===id);if(m)Object.assign(m,{intitule,coefficient,semestre,dateCloture,enseignantId});toast('Module modifié !')}
+  else{D.m.push({id:nid('M'),intitule,coefficient,semestre,dateCloture,enseignantId});toast('Module ajouté !')}
+  $('ti-mm').textContent='Ajouter un Module';$('mm-id').value='';
+  clr('mm-it','mm-co','mm-cl');closeM('m');updCnt();rM();rDash();pops();
+}
+
+/* ════════ INSCRIPTIONS CRUD ════════ */
+function rI(){
+  const fm=($('fi-m')||{}).value||'';
+  const data=D.i.filter(i=>!fm||i.moduleId===fm);
+  $('ti').innerHTML=data.length?`<table>
+    <thead><tr><th>ID</th><th>Étudiant</th><th>Module</th><th>Semestre</th><th>Note moy.</th><th>Actions</th></tr></thead>
+    <tbody>${data.map(i=>{
+      const mod=D.m.find(m=>m.id===i.moduleId);
+      const nr=D.nt.find(n=>n.etudiantId===i.etudiantId&&n.moduleId===i.moduleId);
+      const mv=nr?parseFloat(moy(nr)):null;
+      return`<tr>
+        <td><span class="id-tag">${i.id}</span></td>
+        <td style="font-weight:600">${etName(i.etudiantId)}</td>
+        <td style="color:var(--tx2)">${mName(i.moduleId)}</td>
+        <td>${mod?`<span class="bd ${sC(mod.semestre)}">${mod.semestre}</span>`:'—'}</td>
+        <td>${mv!==null?`<span class="ch ${nC(mv)}">${mv}/20</span>`:'<span style="color:var(--tx3);font-size:12px">Non noté</span>'}</td>
+        <td><button class="btn bre bsm" onclick="opDel('i','${i.id}','Inscription ${i.id}')">🗑 Retirer</button></td>
+      </tr>`;}).join('')}
+    </tbody></table>`:emp('Aucune inscription');
+}
+function svI(){
+  const et=$('mi-et').value,mo=$('mi-mo').value;
+  if(!et||!mo){toast('Sélectionnez étudiant et module.','er');return}
+  if(D.i.find(i=>i.etudiantId===et&&i.moduleId===mo)){toast('Inscription déjà existante.','wa');return}
+  D.i.push({id:nid('I'),etudiantId:et,moduleId:mo});
+  toast('Inscription effectuée !');clr('mi-et','mi-mo');closeM('i');updCnt();rI();rDash();
+}
+
+/* ════════ NOTES CRUD ════════ */
+function rNt(){
+  const fm=($('fn-m')||{}).value||'',fs=($('fn-s')||{}).value||'';
+  const data=D.nt.filter(n=>(!fm||n.moduleId===fm)&&(!fs||n.session===fs));
+  $('tnt').innerHTML=data.length?`<table>
+    <thead><tr><th>ID</th><th>Étudiant</th><th>Module</th><th>TP</th><th>CC</th><th>Exam.</th><th>Moyenne</th><th>Mention</th><th>Session</th><th>Date</th><th>Actions</th></tr></thead>
+    <tbody>${data.map(n=>{
+      const mv=parseFloat(moy(n));
+      return`<tr>
+        <td><span class="id-tag">${n.id}</span></td>
+        <td style="font-weight:600;font-size:13px">${etName(n.etudiantId)}</td>
+        <td style="color:var(--tx2);font-size:12px;max-width:140px">${mName(n.moduleId)}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${n.tp}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${n.controleContinu}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${n.examen}</td>
+        <td><span class="ch ${nC(mv)}">${mv}/20</span></td>
+        <td><span class="bd ${nC(mv)}">${ment(mv)}</span></td>
+        <td><span class="bd ${n.session==='Normale'?'bem2':'bam2'}">${n.session}</span></td>
+        <td style="color:var(--tx3);font-family:'JetBrains Mono',monospace;font-size:11px">${n.dateSaisie}</td>
+        <td><div class="ar">
+          <button class="btn bam bsm" onclick="edNt('${n.id}')">✏️</button>
+          <button class="btn bre bsm" onclick="opDel('nt','${n.id}','Note ${n.id}')">🗑</button>
+        </div></td>
+      </tr>`;}).join('')}
+    </tbody></table>`:emp('Aucune note enregistrée');
+}
+function edNt(id){
+  const n=D.nt.find(x=>x.id===id);if(!n)return;
+  pops();
+  $('ti-mnt').textContent='Modifier la Note';
+  $('mnt-id').value=id;$('mnt-et').value=n.etudiantId;$('mnt-mo').value=n.moduleId;
+  $('mnt-tp').value=n.tp;$('mnt-cc').value=n.controleContinu;$('mnt-ex').value=n.examen;
+  $('mnt-se').value=n.session;$('mnt-da').value=n.dateSaisie;
+  openM('nt');
+}
+function svNt(){
+  const id=$('mnt-id').value;
+  const etudiantId=$('mnt-et').value,moduleId=$('mnt-mo').value;
+  const tp=parseFloat($('mnt-tp').value)||0,controleContinu=parseFloat($('mnt-cc').value)||0,examen=parseFloat($('mnt-ex').value)||0;
+  const session=$('mnt-se').value,dateSaisie=$('mnt-da').value||new Date().toISOString().split('T')[0];
+  if(!etudiantId||!moduleId){toast('Sélectionnez étudiant et module.','er');return}
+  const note=parseFloat(moy({tp,controleContinu,examen}));
+  const appreciation=ment(note);
+  if(id){const n=D.nt.find(x=>x.id===id);if(n)Object.assign(n,{etudiantId,moduleId,tp,controleContinu,examen,note,appreciation,session,dateSaisie});toast('Note modifiée !')}
+  else{D.nt.push({id:nid('N'),etudiantId,moduleId,tp,controleContinu,examen,note,appreciation,session,dateSaisie});toast('Note enregistrée !')}
+  $('ti-mnt').textContent='Saisir une Note';$('mnt-id').value='';
+  clr('mnt-et','mnt-mo','mnt-tp','mnt-cc','mnt-ex','mnt-da');closeM('nt');updCnt();rNt();rDash();
+}
+
+/* ════════ USERS CRUD ════════ */
+function rU(){
+  const q=(($('su')||{}).value||'').toLowerCase();
+  const fr=($('fu-r')||{}).value||'';
+  const data=D.u.filter(u=>(u.username+' '+u.role).toLowerCase().includes(q)&&(!fr||u.role===fr));
+  $('tu').innerHTML=data.length?`<table>
+    <thead><tr><th>ID</th><th>Utilisateur</th><th>Rôle</th><th>Lié à</th><th>Actions</th></tr></thead>
+    <tbody>${data.map(u=>`<tr>
+      <td><span class="id-tag">${u.id}</span></td>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div class="av ${rC(u.role).replace('2','')}" style="font-size:10px">${u.username.slice(0,2).toUpperCase()}</div>
+        <span style="font-weight:600;font-family:'JetBrains Mono',monospace;font-size:13px">${u.username}</span>
+      </div></td>
+      <td><span class="bd ${rC(u.role)}">${u.role}</span></td>
+      <td style="color:var(--tx2);font-size:12px">${u.role==='admin'?'Super admin':u.role==='enseignant'?'Profil enseignant':'Profil étudiant'}</td>
+      <td><div class="ar">
+        <button class="btn bam bsm" onclick="edU('${u.id}')">✏️ Modifier</button>
+        ${u.role!=='admin'?`<button class="btn bre bsm" onclick="opDel('u','${u.id}','${u.username}')">🗑</button>`:''}
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table>`:emp();
+}
+function edU(id){
+  const u=D.u.find(x=>x.id===id);if(!u)return;
+  $('ti-mu').textContent="Modifier l'Utilisateur";
+  $('mu-id').value=id;$('mu-un').value=u.username;$('mu-pw').value='';$('mu-ro').value=u.role;
+  openM('u');
+}
+function svU(){
+  const id=$('mu-id').value;
+  const username=vl('mu-un'),password=$('mu-pw').value,role=$('mu-ro').value;
+  if(!username){toast("Entrez un nom d'utilisateur.",'er');return}
+  if(id){const u=D.u.find(x=>x.id===id);if(u){u.username=username;u.role=role;if(password)u.password=password};toast('Utilisateur modifié !')}
+  else{if(!password){toast('Mot de passe requis.','er');return}D.u.push({id:nid('U'),username,password,role});toast('Compte créé !')}
+  $('ti-mu').textContent='Créer un compte';$('mu-id').value='';
+  clr('mu-un','mu-pw');closeM('u');updCnt();rU();
+}
+
+/* ════════ INIT ════════ */
+pops();
+</script>
+</body>
+</html>

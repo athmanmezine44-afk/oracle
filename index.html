@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GradeFlow — Gestion des Notes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --bg2: #13161e;
+      --bg3: #1a1e28;
+      --bg4: #222636;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --text: #e8eaf0;
+      --text2: #8b90a7;
+      --text3: #555b72;
+      --accent: #4f7ef8;
+      --accent2: #3d6be8;
+      --green: #2dd882;
+      --green-bg: rgba(45,216,130,0.1);
+      --amber: #f5a623;
+      --amber-bg: rgba(245,166,35,0.1);
+      --red: #f05252;
+      --red-bg: rgba(240,82,82,0.1);
+      --blue-bg: rgba(79,126,248,0.1);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-xs: 6px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --shadow-sm: 0 2px 12px rgba(0,0,0,0.3);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+
+    /* ── SCREENS ── */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
+
+    /* ══════════════════════════════════
+       HOME / LOGIN SCREENS
+    ══════════════════════════════════ */
+    .auth-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(79,126,248,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(45,216,130,0.05) 0%, transparent 70%),
+        var(--bg);
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow);
+      animation: fadeUp 0.4s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: var(--accent);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .brand-name { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+    .brand-name span { color: var(--accent); }
+
+    .auth-title { font-size: 22px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .auth-sub { font-size: 14px; color: var(--text2); margin-bottom: 2rem; }
+
+    /* Role cards */
+    .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 0; }
+    .role-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .role-card:hover {
+      border-color: var(--accent);
+      background: var(--bg4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(79,126,248,0.15);
+    }
+    .role-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .role-icon.green { background: var(--green-bg); }
+    .role-icon.blue  { background: var(--blue-bg); }
+    .role-label { font-size: 14px; font-weight: 600; }
+    .role-desc  { font-size: 12px; color: var(--text2); }
+
+    /* Form elements */
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-weight: 500; letter-spacing: 0.3px; }
+    .field input, .field select {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+      font-size: 14px;
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      transition: border-color 0.2s;
+    }
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,126,248,0.12);
+    }
+    .field select option { background: var(--bg3); }
+
+    .hint { font-size: 11px; color: var(--text3); margin-top: 10px; text-align: center; font-family: 'JetBrains Mono', monospace; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 11px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 600;
+      font-family: 'Sora', sans-serif;
+      cursor: pointer;
+      border: none;
+      transition: all 0.18s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,126,248,0.35); }
+    .btn-secondary { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--bg4); color: var(--text); }
+    .btn-green { background: var(--green); color: #0d1a11; }
+    .btn-green:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid rgba(240,82,82,0.2); }
+    .btn-danger:hover { background: rgba(240,82,82,0.2); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-full { width: 100%; }
+
+    .btn-row { display: flex; gap: 10px; margin-top: 4px; }
+
+    /* Error */
+    .err-msg {
+      background: var(--red-bg); color: var(--red);
+      border: 1px solid rgba(240,82,82,0.2);
+      border-radius: var(--radius-xs);
+      padding: 9px 13px; font-size: 13px;
+      margin-bottom: 14px; display: none;
+    }
+
+    /* ══════════════════════════════════
+       TOPBAR
+    ══════════════════════════════════ */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 28px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 14px; }
+    .tb-brand { display: flex; align-items: center; gap: 8px; }
+    .tb-brand-dot { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .tb-brand-name { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+    .tb-divider { width: 1px; height: 20px; background: var(--border2); }
+    .tb-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+    }
+    .tb-avatar.green { background: var(--green-bg); color: var(--green); border: 1px solid rgba(45,216,130,0.25); }
+    .tb-avatar.blue  { background: var(--blue-bg);  color: var(--accent); border: 1px solid rgba(79,126,248,0.25); }
+    .tb-info { }
+    .tb-name { font-size: 13px; font-weight: 600; }
+    .tb-role { font-size: 11px; color: var(--text2); }
+
+    /* ══════════════════════════════════
+       DASHBOARD LAYOUT
+    ══════════════════════════════════ */
+    .dash-body { flex: 1; padding: 28px; display: flex; flex-direction: column; gap: 22px; max-width: 1100px; width: 100%; margin: 0 auto; }
+
+    /* Stats */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; }
+    .stat-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .stat-box-label { font-size: 11px; color: var(--text2); font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+    .stat-box-value { font-size: 26px; font-weight: 700; letter-spacing: -1px; font-family: 'JetBrains Mono', monospace; }
+    .stat-box-value.green { color: var(--green); }
+    .stat-box-value.blue  { color: var(--accent); }
+    .stat-box-value.amber { color: var(--amber); }
+
+    /* Card */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .card-title-icon { font-size: 16px; }
+    .card-body { padding: 20px; }
+    .card-body-flush { padding: 0; }
+
+    /* Tabs */
+    .tabs-wrap { display: flex; gap: 4px; background: var(--bg3); padding: 4px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+    .tab {
+      flex: 1; padding: 8px 14px; font-size: 13px; font-weight: 500;
+      text-align: center; cursor: pointer; border-radius: 6px;
+      color: var(--text2); background: transparent; border: none;
+      font-family: 'Sora', sans-serif;
+      transition: all 0.18s;
+    }
+    .tab.active { background: var(--bg4); color: var(--text); border: 1px solid var(--border2); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: flex; flex-direction: column; gap: 18px; }
+
+    /* Form grid */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr 140px auto; gap: 10px; align-items: end; }
+    @media (max-width: 680px) { .form-grid { grid-template-columns: 1fr 1fr; } }
+
+    /* Table */
+    .tbl-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      padding: 11px 16px; text-align: left;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;
+      color: var(--text2);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+    }
+    tbody td { padding: 13px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--bg3); }
+    tbody tr.editing td { background: rgba(245,166,35,0.05); }
+
+    /* Badges / pills */
+    .badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+    }
+    .badge-green  { background: var(--green-bg);  color: var(--green); }
+    .badge-blue   { background: var(--blue-bg);   color: var(--accent); }
+    .badge-amber  { background: var(--amber-bg);  color: var(--amber); }
+    .badge-red    { background: var(--red-bg);    color: var(--red); }
+
+    .note-chip {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 46px; height: 26px; border-radius: 13px;
+      font-size: 12px; font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .nc-green { background: var(--green-bg); color: var(--green); }
+    .nc-blue  { background: var(--blue-bg);  color: var(--accent); }
+    .nc-amber { background: var(--amber-bg); color: var(--amber); }
+    .nc-red   { background: var(--red-bg);   color: var(--red); }
+
+    /* Student cards in list */
+    .stu-list { display: flex; flex-direction: column; gap: 8px; }
+    .stu-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 13px 16px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      transition: border-color 0.18s, background 0.18s;
+    }
+    .stu-row:hover { border-color: var(--border2); background: var(--bg4); }
+    .stu-left { display: flex; align-items: center; gap: 12px; }
+    .stu-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--blue-bg); color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700;
+      border: 1px solid rgba(79,126,248,0.2);
+    }
+    .stu-name { font-size: 13px; font-weight: 600; }
+    .stu-meta { font-size: 11px; color: var(--text2); margin-top: 2px; }
+    .stu-right { display: flex; align-items: center; gap: 10px; }
+
+    /* Student dashboard specifics */
+    .big-avg { font-size: 56px; font-weight: 700; letter-spacing: -3px; font-family: 'JetBrains Mono', monospace; }
+    .big-avg.green { color: var(--green); }
+    .big-avg.amber { color: var(--amber); }
+    .big-avg.red   { color: var(--red); }
+    .big-avg-sub { font-size: 16px; color: var(--text2); font-family: 'JetBrains Mono', monospace; }
+
+    .mat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .mat-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+    }
+    .mat-name { font-size: 11px; color: var(--text2); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .mat-val  { font-size: 20px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    .mat-cnt  { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+    /* Inline edit input */
+    .edit-input {
+      background: var(--bg4);
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-xs);
+      padding: 5px 10px;
+      font-size: 13px; font-weight: 600;
+      color: var(--amber);
+      font-family: 'JetBrains Mono', monospace;
+      width: 70px;
+    }
+    .edit-input:focus { outline: none; box-shadow: 0 0 0 3px rgba(245,166,35,0.15); }
+
+    /* Filter bar */
+    .filter-bar { display: flex; gap: 8px; align-items: center; }
+    .filter-select {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 6px 12px;
+      font-size: 12px; color: var(--text2);
+      font-family: 'Sora', sans-serif;
+      cursor: pointer;
+    }
+    .filter-select:focus { outline: none; border-color: var(--accent); }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 3rem 2rem; color: var(--text3); font-size: 13px; }
+    .empty-state-icon { font-size: 32px; display: block; margin-bottom: 12px; opacity: 0.4; }
+
+    /* Section title */
+    .section-sep { font-size: 11px; font-weight: 600; color: var(--text2); letter-spacing: 1px; text-transform: uppercase; }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--border); }
+
+    /* Avatar group */
+    .avg-display { display: flex; align-items: baseline; gap: 8px; }
+
+    /* Notification toast */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--bg4);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      padding: 12px 18px;
+      font-size: 13px;
+      box-shadow: var(--shadow);
+      display: flex; align-items: center; gap: 10px;
+      transform: translateY(80px); opacity: 0;
+      transition: all 0.3s;
+      z-index: 9999;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: rgba(45,216,130,0.3); }
+    .toast.error   { border-color: rgba(240,82,82,0.3); }
+
+    /* Progress bar */
+    .progress-bar-wrap { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; width: 80px; }
+    .progress-bar { height: 100%; border-radius: 2px; transition: width 0.3s; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════
+     SCREEN: HOME
+══════════════════════════════════ -->
+<div class="screen active" id="screen-home">
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="brand">
+        <div class="brand-icon">📊</div>
+        <div class="brand-name">Grade<span>Flow</span></div>
+      </div>
+      <h1 class="auth-title">Portail de gestion des notes</h1>
+      <p class="auth-sub">Choisissez votre espace pour continuer</p>
+      <div class="role-grid">
+        <div class="role-card" onclick="goTo('screen-login-prof')">
+          <div class="role-icon green">🎓</div>
+          <div>
+            <div class="role-label">Professeur</div>
+            <div class="role-desc">Saisir et gérer les notes</div>
+          </div>
+        </div>
+        <div class="role-card" onclick="goTo('screen-login-etu')">
+          <div class="role-icon blue">👤</div>
+          <div>
+            <div class="role-label">Étudiant</div>
+            <div class="role-desc">Consulter mes résultats</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN: LOGIN PROF
+══════════════════════════════════ -->
+<div class="screen" id="screen-login-prof">
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="brand"><div class="brand-icon">🎓</div><div class="brand-name">Grade<span>Flow</span></div></div>
+      <h1 class="auth-title">Espace Professeur</h1>
+      <p class="auth-sub">Connectez-vous pour accéder au tableau de bord</p>
+      <div class="err-msg" id="err-prof">Identifiant ou mot de passe incorrect.</div>
+      <div class="field">
+        <label>IDENTIFIANT</label>
+        <input type="text" id="prof-id" placeholder="ex: prof1" />
+      </div>
+      <div class="field">
+        <label>MOT DE PASSE</label>
+        <input type="password" id="prof-pass" placeholder="••••••" />
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goTo('screen-home')">← Retour</button>
+        <button class="btn btn-primary btn-full" onclick="loginProf()">Se connecter</button>
+      </div>
+      <p class="hint">Essai → identifiant: prof1 · mot de passe: 1234</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN: LOGIN ÉTUDIANT
+══════════════════════════════════ -->
+<div class="screen" id="screen-login-etu">
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="brand"><div class="brand-icon">👤</div><div class="brand-name">Grade<span>Flow</span></div></div>
+      <h1 class="auth-title">Espace Étudiant</h1>
+      <p class="auth-sub">Entrez vos identifiants pour consulter vos notes</p>
+      <div class="err-msg" id="err-etu">Numéro étudiant ou mot de passe incorrect.</div>
+      <div class="field">
+        <label>NUMÉRO ÉTUDIANT</label>
+        <input type="text" id="etu-id" placeholder="ex: 2023001" />
+      </div>
+      <div class="field">
+        <label>MOT DE PASSE</label>
+        <input type="password" id="etu-pass" placeholder="••••••" />
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goTo('screen-home')">← Retour</button>
+        <button class="btn btn-primary btn-full" onclick="loginEtu()">Consulter mes notes</button>
+      </div>
+      <p class="hint">Essai → numéro: 2023001 · mot de passe: etu123</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN: DASHBOARD PROFESSEUR
+══════════════════════════════════ -->
+<div class="screen" id="screen-prof">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="tb-brand">
+        <div class="tb-brand-dot">📊</div>
+        <div class="tb-brand-name">GradeFlow</div>
+      </div>
+      <div class="tb-divider"></div>
+      <div class="tb-avatar green" id="prof-avatar-top">MP</div>
+      <div class="tb-info">
+        <div class="tb-name" id="prof-name-top">Prof. Martin Paul</div>
+        <div class="tb-role">Enseignant · Tableau de bord</div>
+      </div>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="logout()">⬡ Déconnexion</button>
+  </div>
+
+  <div class="dash-body">
+    <!-- Stats -->
+    <div class="stats-row" id="prof-stats"></div>
+
+    <!-- Tabs -->
+    <div class="tabs-wrap" id="tabs-prof">
+      <button class="tab active" onclick="switchTab('t-saisie','t-liste','t-etudiants')">✏️ Saisir une note</button>
+      <button class="tab" onclick="switchTab('t-liste','t-saisie','t-etudiants')">📋 Toutes les notes</button>
+      <button class="tab" onclick="switchTab('t-etudiants','t-saisie','t-liste')">👥 Étudiants</button>
+    </div>
+
+    <!-- TAB: SAISIE -->
+    <div class="tab-panel active" id="t-saisie">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="card-title-icon">➕</span> Nouvelle note</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="field" style="margin:0">
+              <label>ÉTUDIANT</label>
+              <select id="sel-etu"></select>
+            </div>
+            <div class="field" style="margin:0">
+              <label>MATIÈRE</label>
+              <select id="sel-mat">
+                <option value="">— Choisir —</option>
+                <option>Mathématiques</option>
+                <option>Physique</option>
+                <option>Informatique</option>
+                <option>Français</option>
+                <option>Anglais</option>
+                <option>Histoire</option>
+                <option>Chimie</option>
+                <option>Philosophie</option>
+              </select>
+            </div>
+            <div class="field" style="margin:0">
+              <label>NOTE /20</label>
+              <input type="number" id="inp-note" min="0" max="20" step="0.5" placeholder="0 – 20" />
+            </div>
+            <button class="btn btn-green" onclick="addNote()">+ Ajouter</button>
+          </div>
+          <div class="err-msg" id="err-note" style="margin-top:14px;margin-bottom:0"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: LISTE DES NOTES -->
+    <div class="tab-panel" id="t-liste">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="card-title-icon">📋</span> Toutes les notes</div>
+          <div class="filter-bar">
+            <select class="filter-select" id="filter-mat" onchange="renderTableProf()">
+              <option value="">Toutes matières</option>
+              <option>Mathématiques</option>
+              <option>Physique</option>
+              <option>Informatique</option>
+              <option>Français</option>
+              <option>Anglais</option>
+              <option>Histoire</option>
+              <option>Chimie</option>
+              <option>Philosophie</option>
+            </select>
+            <select class="filter-select" id="filter-etu" onchange="renderTableProf()">
+              <option value="">Tous étudiants</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body-flush tbl-wrap">
+          <div id="table-all-notes"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ÉTUDIANTS -->
+    <div class="tab-panel" id="t-etudiants">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><span class="card-title-icon">👥</span> Résumé par étudiant</div>
+        </div>
+        <div class="card-body">
+          <div class="stu-list" id="stu-list-prof"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SCREEN: DASHBOARD ÉTUDIANT
+══════════════════════════════════ -->
+<div class="screen" id="screen-etu">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="tb-brand">
+        <div class="tb-brand-dot">📊</div>
+        <div class="tb-brand-name">GradeFlow</div>
+      </div>
+      <div class="tb-divider"></div>
+      <div class="tb-avatar blue" id="etu-avatar-top">AY</div>
+      <div class="tb-info">
+        <div class="tb-name" id="etu-name-top">Étudiant</div>
+        <div class="tb-role">Étudiant · Mes résultats</div>
+      </div>
+    </div>
+    <button class="btn btn-secondary btn-sm" onclick="logout()">⬡ Déconnexion</button>
+  </div>
+
+  <div class="dash-body">
+
+    <!-- Moyenne générale -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="card-title-icon">📈</span> Moyenne générale</div>
+      </div>
+      <div class="card-body" style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <div>
+          <div class="avg-display">
+            <div class="big-avg" id="etu-moy-big">—</div>
+            <div class="big-avg-sub">/20</div>
+          </div>
+          <div id="etu-mention-badge" style="margin-top:8px"></div>
+        </div>
+        <div style="flex:1;min-width:200px" id="etu-progress-wrap"></div>
+      </div>
+    </div>
+
+    <!-- Stats étudiant -->
+    <div class="stats-row" id="etu-stats"></div>
+
+    <!-- Par matière -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="card-title-icon">📚</span> Résultats par matière</div>
+      </div>
+      <div class="card-body">
+        <div class="mat-grid" id="etu-mat-grid"></div>
+      </div>
+    </div>
+
+    <!-- Détail notes -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title"><span class="card-title-icon">📄</span> Détail de mes notes</div>
+      </div>
+      <div class="card-body-flush tbl-wrap">
+        <div id="etu-notes-detail"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══ DATA ══════════════════════════════════════════════════════ */
+const PROFS = {
+  prof1: { pass: '1234',  nom: 'Martin Paul',  initiales: 'MP', matiere: 'Mathématiques & Physique' },
+  prof2: { pass: 'abcd',  nom: 'Benali Sara',  initiales: 'BS', matiere: 'Informatique & Anglais'   },
+};
+const ETUDIANTS = {
+  '2023001': { pass: 'etu123', nom: 'Alami Yassine',   initiales: 'AY', groupe: 'L3-INFO' },
+  '2023002': { pass: 'etu456', nom: 'El Fassi Fatima', initiales: 'EF', groupe: 'L3-INFO' },
+  '2023003': { pass: 'etu789', nom: 'Ouali Mehdi',     initiales: 'OM', groupe: 'L2-PHY'  },
+  '2023004': { pass: 'etu000', nom: 'Ziani Amira',     initiales: 'ZA', groupe: 'L2-PHY'  },
+};
+
+let notes = [
+  { id:1,  etuId:'2023001', matiere:'Mathématiques', note:15.5 },
+  { id:2,  etuId:'2023001', matiere:'Physique',       note:12   },
+  { id:3,  etuId:'2023001', matiere:'Informatique',   note:18   },
+  { id:4,  etuId:'2023001', matiere:'Anglais',        note:14   },
+  { id:5,  etuId:'2023002', matiere:'Mathématiques', note:9.5  },
+  { id:6,  etuId:'2023002', matiere:'Anglais',        note:16   },
+  { id:7,  etuId:'2023002', matiere:'Informatique',   note:13   },
+  { id:8,  etuId:'2023003', matiere:'Physique',       note:13   },
+  { id:9,  etuId:'2023003', matiere:'Français',       note:11   },
+  { id:10, etuId:'2023003', matiere:'Chimie',         note:8    },
+  { id:11, etuId:'2023004', matiere:'Informatique',   note:17.5 },
+  { id:12, etuId:'2023004', matiere:'Histoire',       note:14   },
+  { id:13, etuId:'2023004', matiere:'Mathématiques', note:12.5 },
+];
+let nextId = 14;
+let currentRole = null;
+let currentUser = null;
+
+/* ══ HELPERS ══════════════════════════════════════════════════ */
+function noteColor(n) {
+  if (n >= 16) return 'green';
+  if (n >= 12) return 'blue';
+  if (n >= 10) return 'amber';
+  return 'red';
+}
+function noteBadge(n) { return 'badge-' + noteColor(n); }
+function noteChip(n)  { return 'nc-'    + noteColor(n); }
+function mention(n) {
+  if (n >= 16) return '🏆 Très bien';
+  if (n >= 14) return '✅ Bien';
+  if (n >= 12) return '👍 Assez bien';
+  if (n >= 10) return '📌 Passable';
+  return '❌ Insuffisant';
+}
+function mentionShort(n) {
+  if (n >= 16) return 'Très bien';
+  if (n >= 14) return 'Bien';
+  if (n >= 12) return 'Assez bien';
+  if (n >= 10) return 'Passable';
+  return 'Insuffisant';
+}
+function avg(arr) { return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null; }
+function fmt(n, d=2) { return n !== null ? Number(n).toFixed(d) : '—'; }
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = (type==='success' ? '✓ ' : '✗ ') + msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+/* ══ NAVIGATION ════════════════════════════════════════════════ */
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ══ AUTH ══════════════════════════════════════════════════════ */
+function loginProf() {
+  const id   = document.getElementById('prof-id').value.trim();
+  const pass = document.getElementById('prof-pass').value;
+  const err  = document.getElementById('err-prof');
+  if (!PROFS[id] || PROFS[id].pass !== pass) { err.style.display='block'; return; }
+  err.style.display = 'none';
+  currentRole = 'prof'; currentUser = id;
+  const p = PROFS[id];
+  document.getElementById('prof-name-top').textContent    = 'Prof. ' + p.nom;
+  document.getElementById('prof-avatar-top').textContent  = p.initiales;
+  populateSelEtu();
+  populateFilterEtu();
+  renderProfStats();
+  renderTableProf();
+  renderStuList();
+  goTo('screen-prof');
+  showToast('Bienvenue, Prof. ' + p.nom.split(' ')[0]);
+}
+
+function loginEtu() {
+  const id   = document.getElementById('etu-id').value.trim();
+  const pass = document.getElementById('etu-pass').value;
+  const err  = document.getElementById('err-etu');
+  if (!ETUDIANTS[id] || ETUDIANTS[id].pass !== pass) { err.style.display='block'; return; }
+  err.style.display = 'none';
+  currentRole = 'etu'; currentUser = id;
+  const e = ETUDIANTS[id];
+  document.getElementById('etu-name-top').textContent   = e.nom;
+  document.getElementById('etu-avatar-top').textContent = e.initiales;
+  renderEtuDash(id);
+  goTo('screen-etu');
+  showToast('Bienvenue, ' + e.nom.split(' ')[0]);
+}
+
+function logout() {
+  currentRole = currentUser = null;
+  ['prof-id','prof-pass','etu-id','etu-pass'].forEach(id => document.getElementById(id).value = '');
+  goTo('screen-home');
+}
+
+/* ══ POPULATE SELECTS ══════════════════════════════════════════ */
+function populateSelEtu() {
+  const sel = document.getElementById('sel-etu');
+  sel.innerHTML = '<option value="">— Choisir un étudiant —</option>';
+  Object.entries(ETUDIANTS).forEach(([id, e]) => {
+    sel.innerHTML += `<option value="${id}">${e.nom} (${id})</option>`;
+  });
+}
+function populateFilterEtu() {
+  const sel = document.getElementById('filter-etu');
+  sel.innerHTML = '<option value="">Tous étudiants</option>';
+  Object.entries(ETUDIANTS).forEach(([id, e]) => {
+    sel.innerHTML += `<option value="${id}">${e.nom}</option>`;
+  });
+}
+
+/* ══ PROF STATS ════════════════════════════════════════════════ */
+function renderProfStats() {
+  const total  = notes.length;
+  const moyVal = avg(notes.map(n=>n.note));
+  const reussi = notes.filter(n=>n.note>=10).length;
+  const etuSet = new Set(notes.map(n=>n.etuId)).size;
+  document.getElementById('prof-stats').innerHTML = `
+    <div class="stat-box"><div class="stat-box-label">Notes saisies</div><div class="stat-box-value blue">${total}</div></div>
+    <div class="stat-box"><div class="stat-box-label">Moyenne classe</div><div class="stat-box-value ${noteColor(moyVal||0)}">${fmt(moyVal)}</div></div>
+    <div class="stat-box"><div class="stat-box-label">Taux de réussite</div><div class="stat-box-value green">${total?Math.round(reussi/total*100):0}%</div></div>
+    <div class="stat-box"><div class="stat-box-label">Étudiants notés</div><div class="stat-box-value amber">${etuSet}</div></div>
+  `;
+}
+
+/* ══ TABLE DES NOTES (PROF) ════════════════════════════════════ */
+function renderTableProf() {
+  const fMat = (document.getElementById('filter-mat')||{}).value||'';
+  const fEtu = (document.getElementById('filter-etu')||{}).value||'';
+  let filtered = notes;
+  if (fMat) filtered = filtered.filter(n=>n.matiere===fMat);
+  if (fEtu) filtered = filtered.filter(n=>n.etuId===fEtu);
+  const wrap = document.getElementById('table-all-notes');
+  if (!filtered.length) {
+    wrap.innerHTML = `<div class="empty-state"><span class="empty-state-icon">📭</span>Aucune note trouvée.</div>`;
+    return;
+  }
+  const rows = filtered.map(n => {
+    const e = ETUDIANTS[n.etuId];
+    return `<tr id="row-${n.id}">
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--blue-bg);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${e?e.initiales:'??'}</div>
+        <div>
+          <div style="font-weight:600;font-size:13px">${e?e.nom:n.etuId}</div>
+          <div style="font-size:11px;color:var(--text2)">${e?e.groupe:''}</div>
+        </div>
+      </div></td>
+      <td><span style="font-size:13px">${n.matiere}</span></td>
+      <td><span class="note-chip ${noteChip(n.note)}">${n.note}/20</span></td>
+      <td><span class="badge ${noteBadge(n.note)}">${mentionShort(n.note)}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-secondary btn-sm" onclick="startEdit(${n.id})" style="margin-right:6px">✏️ Modifier</button>
+        <button class="btn btn-danger btn-sm" onclick="delNote(${n.id})">🗑 Supprimer</button>
+      </td>
+    </tr>`;
+  }).join('');
+  wrap.innerHTML = `<table>
+    <thead><tr><th>Étudiant</th><th>Matière</th><th>Note</th><th>Mention</th><th>Actions</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+/* ══ AJOUTER NOTE ══════════════════════════════════════════════ */
+function addNote() {
+  const etuId = document.getElementById('sel-etu').value;
+  const mat   = document.getElementById('sel-mat').value;
+  const note  = parseFloat(document.getElementById('inp-note').value);
+  const err   = document.getElementById('err-note');
+  if (!etuId) { err.textContent='Sélectionnez un étudiant.'; err.style.display='block'; return; }
+  if (!mat)   { err.textContent='Sélectionnez une matière.'; err.style.display='block'; return; }
+  if (isNaN(note)||note<0||note>20) { err.textContent='La note doit être entre 0 et 20.'; err.style.display='block'; return; }
+  err.style.display = 'none';
+  notes.push({ id:nextId++, etuId, matiere:mat, note });
+  document.getElementById('inp-note').value = '';
+  renderProfStats(); renderTableProf(); renderStuList();
+  showToast('Note ajoutée avec succès !');
+}
+
+/* ══ SUPPRIMER NOTE ════════════════════════════════════════════ */
+function delNote(id) {
+  notes = notes.filter(n=>n.id!==id);
+  renderProfStats(); renderTableProf(); renderStuList();
+  showToast('Note supprimée.', 'error');
+}
+
+/* ══ MODIFIER NOTE ═════════════════════════════════════════════ */
+function startEdit(id) {
+  const n = notes.find(x=>x.id===id);
+  if (!n) return;
+  const row = document.getElementById('row-'+id);
+  if (!row) return;
+  const tds = row.querySelectorAll('td');
+  tds[2].innerHTML = `<input class="edit-input" type="number" id="edit-inp-${id}" min="0" max="20" step="0.5" value="${n.note}" />`;
+  tds[4].innerHTML = `
+    <button class="btn btn-green btn-sm" onclick="saveEdit(${id})" style="margin-right:6px">✓ Sauvegarder</button>
+    <button class="btn btn-secondary btn-sm" onclick="renderTableProf()">Annuler</button>`;
+  row.classList.add('editing');
+}
+function saveEdit(id) {
+  const inp = document.getElementById('edit-inp-'+id);
+  const val = parseFloat(inp.value);
+  if (isNaN(val)||val<0||val>20) { showToast('Note invalide.','error'); return; }
+  const n = notes.find(x=>x.id===id);
+  if (n) n.note = val;
+  renderProfStats(); renderTableProf(); renderStuList();
+  showToast('Note modifiée avec succès !');
+}
+
+/* ══ LISTE ÉTUDIANTS ═══════════════════════════════════════════ */
+function renderStuList() {
+  const list = document.getElementById('stu-list-prof');
+  list.innerHTML = Object.entries(ETUDIANTS).map(([id, e]) => {
+    const eNotes = notes.filter(n=>n.etuId===id);
+    const moyVal = avg(eNotes.map(n=>n.note));
+    const pct = moyVal !== null ? Math.round(moyVal/20*100) : 0;
+    return `<div class="stu-row">
+      <div class="stu-left">
+        <div class="stu-avatar">${e.initiales}</div>
+        <div>
+          <div class="stu-name">${e.nom}</div>
+          <div class="stu-meta">${id} · ${e.groupe} · ${eNotes.length} note(s)</div>
+        </div>
+      </div>
+      <div class="stu-right">
+        ${moyVal!==null?`
+          <div class="progress-bar-wrap"><div class="progress-bar" style="width:${pct}%;background:${moyVal>=10?'var(--green)':moyVal>=8?'var(--amber)':'var(--red)'}"></div></div>
+          <span class="note-chip ${noteChip(moyVal)}">${fmt(moyVal,1)}</span>
+          <span class="badge ${noteBadge(moyVal)}">${mentionShort(moyVal)}</span>
+        ` : '<span style="color:var(--text3);font-size:12px">Aucune note</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ══ DASHBOARD ÉTUDIANT ════════════════════════════════════════ */
+function renderEtuDash(etuId) {
+  const eNotes = notes.filter(n=>n.etuId===etuId);
+  const moyVal = avg(eNotes.map(n=>n.note));
+  const color  = moyVal!==null ? noteColor(moyVal) : '';
+
+  // Moyenne big
+  const bigEl = document.getElementById('etu-moy-big');
+  bigEl.textContent = moyVal!==null ? fmt(moyVal) : '—';
+  bigEl.className   = 'big-avg ' + color;
+
+  // Badge mention
+  document.getElementById('etu-mention-badge').innerHTML = moyVal!==null
+    ? `<span class="badge badge-${color}" style="font-size:13px;padding:5px 14px">${mention(moyVal)}</span>` : '';
+
+  // Progress visual
+  const pct = moyVal!==null ? Math.round(moyVal/20*100) : 0;
+  const progColor = moyVal!==null ? (moyVal>=16?'var(--green)':moyVal>=12?'var(--accent)':moyVal>=10?'var(--amber)':'var(--red)') : 'var(--text3)';
+  document.getElementById('etu-progress-wrap').innerHTML = `
+    <div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Progression</div>
+    <div style="height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:6px">
+      <div style="height:100%;width:${pct}%;background:${progColor};border-radius:4px;transition:width .4s"></div>
+    </div>
+    <div style="font-size:12px;color:var(--text2)">${pct}% de 20 points</div>
+  `;
+
+  // Etu stats
+  const reussi = eNotes.filter(n=>n.note>=10).length;
+  const meilleure = eNotes.length ? Math.max(...eNotes.map(n=>n.note)) : null;
+  const matiereCount = new Set(eNotes.map(n=>n.matiere)).size;
+  document.getElementById('etu-stats').innerHTML = `
+    <div class="stat-box"><div class="stat-box-label">Notes reçues</div><div class="stat-box-value blue">${eNotes.length}</div></div>
+    <div class="stat-box"><div class="stat-box-label">Matières</div><div class="stat-box-value amber">${matiereCount}</div></div>
+    <div class="stat-box"><div class="stat-box-label">Acquis (≥10)</div><div class="stat-box-value green">${reussi}/${eNotes.length}</div></div>
+    ${meilleure!==null?`<div class="stat-box"><div class="stat-box-label">Meilleure note</div><div class="stat-box-value green">${meilleure}/20</div></div>`:''}
+  `;
+
+  // Par matière
+  const byMat = {};
+  eNotes.forEach(n => { if (!byMat[n.matiere]) byMat[n.matiere]=[]; byMat[n.matiere].push(n.note); });
+  const matGrid = document.getElementById('etu-mat-grid');
+  if (!Object.keys(byMat).length) {
+    matGrid.innerHTML = '<div class="empty-state"><span class="empty-state-icon">📚</span>Aucune note enregistrée.</div>';
+  } else {
+    matGrid.innerHTML = Object.entries(byMat).map(([mat, ns]) => {
+      const m = avg(ns);
+      const c = noteColor(m);
+      const colors = { green:'var(--green)', blue:'var(--accent)', amber:'var(--amber)', red:'var(--red)' };
+      return `<div class="mat-card">
+        <div class="mat-name">${mat}</div>
+        <div class="mat-val" style="color:${colors[c]}">${fmt(m,1)}<span style="font-size:13px;color:var(--text2)">/20</span></div>
+        <div class="mat-cnt">${ns.length} note(s) · ${mentionShort(m)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Table détail
+  const wrap = document.getElementById('etu-notes-detail');
+  if (!eNotes.length) {
+    wrap.innerHTML = '<div class="empty-state"><span class="empty-state-icon">📄</span>Aucune note disponible.</div>';
+    return;
+  }
+  const rows = [...eNotes].sort((a,b)=>b.note-a.note).map(n => `<tr>
+    <td style="font-weight:600">${n.matiere}</td>
+    <td><span class="note-chip ${noteChip(n.note)}">${n.note}/20</span></td>
+    <td><span class="badge ${noteBadge(n.note)}">${mentionShort(n.note)}</span></td>
+    <td>
+      <div class="progress-bar-wrap" style="width:100px">
+        <div class="progress-bar" style="width:${Math.round(n.note/20*100)}%;background:${n.note>=16?'var(--green)':n.note>=12?'var(--accent)':n.note>=10?'var(--amber)':'var(--red)'}"></div>
+      </div>
+    </td>
+  </tr>`).join('');
+  wrap.innerHTML = `<table>
+    <thead><tr><th>Matière</th><th>Note</th><th>Mention</th><th>Progression</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+/* ══ TAB SWITCH ════════════════════════════════════════════════ */
+function switchTab(...panelIds) {
+  const active = panelIds[0];
+  panelIds.forEach(id => {
+    const p = document.getElementById(id);
+    if (p) p.classList.toggle('active', id===active);
+  });
+  // Update tab buttons
+  const tabs = document.querySelectorAll('#tabs-prof .tab');
+  const labels = ['t-saisie','t-liste','t-etudiants'];
+  tabs.forEach((t,i) => t.classList.toggle('active', labels[i]===active));
+  // Render on switch
+  if (active==='t-liste')     { renderTableProf(); }
+  if (active==='t-etudiants') { renderStuList(); }
+}
+</script>
+</body>
+</html>
