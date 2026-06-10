@@ -61,7 +61,10 @@ input,select,button,textarea{font-family:'Inter',sans-serif}
 .ar{display:flex;gap:5px;align-items:center}
 
 /* ─── SHELL ──────────────────────────────── */
-#app{display:none;height:100vh}#app.on{display:flex}
+#app{
+    display:flex;
+    height:100vh;
+}
 
 /* ─── SIDEBAR ────────────────────────────── */
 .sb{width:var(--sw);background:var(--bg1);border-right:1px solid var(--ln);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
@@ -187,24 +190,10 @@ tbody tr:hover td{background:var(--bg2)}
 <body>
 
 <!-- ══════ LOGIN ══════ -->
-<div id="ls">
-  <div class="lc">
-    <div class="lb">
-      <div class="lbi">EA</div>
-      <div class="lbt">Edu<span>Admin</span></div>
-    </div>
-    <div class="lt">Panneau Administrateur</div>
-    <div class="ls2">Gestion académique centralisée</div>
-    <div class="lerr" id="lerr">Identifiants incorrects.</div>
-    <div class="f"><label>Identifiant</label><input id="lu" type="text" placeholder="admin"/></div>
-    <div class="f"><label>Mot de passe</label><input id="lp" type="password" placeholder="••••••"/></div>
-    <button class="btn bp bfl" style="margin-top:6px" onclick="login()">Accéder au tableau de bord →</button>
-    <div class="lhi">admin / admin123</div>
-  </div>
-</div>
+
 
 <!-- ══════ APP ══════ -->
-<div id="app">
+<div id="app" class="on">
 
   <!-- SIDEBAR -->
   <nav class="sb">
@@ -565,18 +554,6 @@ function pops(){
 }
 
 /* ════════ AUTH ════════ */
-function login(){
-  const u=vl('lu'),p=vl('lp'),err=$('lerr');
-  if(u==='admin'&&p==='admin123'){
-    err.style.display='none';
-    $('ls').style.display='none';
-    $('app').classList.add('on');
-    $('dt').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-    updCnt();pops();rDash();rE();rN();rM();rI();rNt();rU();
-  }else err.style.display='block';
-}
-function logout(){$('app').classList.remove('on');$('ls').style.display='flex';$('lu').value='';$('lp').value=''}
-['lu','lp'].forEach(id=>$(id).addEventListener('keydown',e=>e.key==='Enter'&&login()));
 
 /* ════════ NAV ════════ */
 const TITLES={dashboard:'Dashboard',etudiants:'Étudiants',enseignants:'Enseignants',modules:'Modules',inscriptions:'Inscriptions',notes:'Notes',users:'Utilisateurs'};
@@ -884,6 +861,26 @@ function svU(){
 
 /* ════════ INIT ════════ */
 pops();
+window.onload = function () {
+
+    document.getElementById("dt").textContent =
+        new Date().toLocaleDateString('fr-FR', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+    updCnt();
+    pops();
+    rDash();
+    rE();
+    rN();
+    rM();
+    rI();
+    rNt();
+    rU();
+};
 </script>
 </body>
 </html>
