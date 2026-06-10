@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EduAdmin — Connexion</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+<style>
+  :root {
+    --bg:       #07090f;
+    --bg1:      #0c0f1a;
+    --bg2:      #111625;
+    --bg3:      #171d2e;
+    --line:     rgba(255,255,255,.07);
+    --line2:    rgba(255,255,255,.12);
+    --tx:       #cbd2ea;
+    --tx2:      #6b7494;
+    --tx3:      #35405c;
+    --blue:     #5b7cf7;
+    --blue-dim: rgba(91,124,247,.13);
+    --blue-glo: rgba(91,124,247,.25);
+    --green:    #34d399;
+    --green-dim:rgba(52,211,153,.12);
+    --red:      #f87171;
+    --red-dim:  rgba(248,113,113,.12);
+    --amber:    #fbbf24;
+    --r: 10px; --rs: 8px; --rx: 5px;
+    --sh: 0 20px 60px rgba(0,0,0,.6);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--tx);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background-image:
+      radial-gradient(ellipse 70% 50% at 15% 20%, rgba(91,124,247,.09) 0, transparent 70%),
+      radial-gradient(ellipse 60% 40% at 85% 80%, rgba(52,211,153,.06) 0, transparent 70%);
+  }
+
+  /* ── CARD ───────────────────────────────── */
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg1);
+    border: 1px solid var(--line2);
+    border-radius: 18px;
+    padding: 2.2rem 2rem 1.8rem;
+    box-shadow: var(--sh);
+    animation: fadeUp .45s cubic-bezier(.22,1,.36,1);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── LOGO ───────────────────────────────── */
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.8rem;
+  }
+
+  .logo-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    background: var(--blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #fff;
+    box-shadow: 0 4px 18px var(--blue-glo);
+  }
+
+  .logo-text {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+  }
+
+  .logo-text span { color: var(--blue); }
+
+  /* ── HEADING ────────────────────────────── */
+  .heading {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -.5px;
+    margin-bottom: 5px;
+  }
+
+  .subheading {
+    font-size: 13px;
+    color: var(--tx2);
+    margin-bottom: 1.6rem;
+  }
+
+  /* ── ROLE SELECTOR ──────────────────────── */
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 1.4rem;
+  }
+
+  .role-btn {
+    padding: 11px 6px;
+    border-radius: var(--rs);
+    border: 1px solid var(--line);
+    background: var(--bg2);
+    cursor: pointer;
+    text-align: center;
+    transition: all .18s;
+  }
+
+  .role-btn:hover {
+    border-color: var(--line2);
+    background: var(--bg3);
+  }
+
+  .role-btn.active {
+    border-color: var(--blue);
+    background: var(--blue-dim);
+  }
+
+  .role-btn.active .rb-ico,
+  .role-btn.active .rb-lbl {
+    color: var(--blue);
+  }
+
+  .rb-ico {
+    font-size: 20px;
+    color: var(--tx2);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .rb-lbl {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--tx2);
+  }
+
+  /* ── FORM FIELDS ────────────────────────── */
+  .fld {
+    margin-bottom: 13px;
+  }
+
+  .fld label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--tx3);
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .inp-wrap { position: relative; }
+
+  .inp-wrap .ico-left {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: var(--tx2);
+    pointer-events: none;
+  }
+
+  .inp-wrap .ico-right {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: var(--tx2);
+    cursor: pointer;
+  }
+
+  .inp-wrap input { padding-left: 36px !important; }
+
+  input {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--line2);
+    border-radius: var(--rs);
+    padding: 11px 14px;
+    font-size: 13px;
+    color: var(--tx);
+    font-family: 'Inter', sans-serif;
+    transition: border-color .18s, box-shadow .18s;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(91,124,247,.15);
+  }
+
+  input::placeholder { color: var(--tx3); }
+
+  /* ── ERROR BOX ──────────────────────────── */
+  .err-box {
+    background: var(--red-dim);
+    border: 1px solid rgba(248,113,113,.22);
+    border-radius: var(--rx);
+    padding: 9px 12px;
+    font-size: 13px;
+    color: var(--red);
+    margin-bottom: 13px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .err-box.show { display: flex; }
+
+  /* ── SUBMIT ─────────────────────────────── */
+  .submit {
+    width: 100%;
+    padding: 11px;
+    border: none;
+    border-radius: var(--rs);
+    background: var(--blue);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all .18s;
+    margin-top: 4px;
+    box-shadow: 0 2px 14px var(--blue-glo);
+  }
+
+  .submit:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px var(--blue-glo);
+  }
+
+  .submit:active { transform: scale(.99); }
+
+  /* ── FORGOT ─────────────────────────────── */
+  .forgot {
+    text-align: center;
+    margin-top: 1.2rem;
+    font-size: 12px;
+    color: var(--tx2);
+  }
+
+  .forgot a {
+    color: var(--blue);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .forgot a:hover { text-decoration: underline; }
+
+  /* ── HINT BOX ───────────────────────────── */
+  .hint {
+    margin-top: 1.4rem;
+    background: var(--bg2);
+    border: 1px solid var(--line);
+    border-radius: var(--rs);
+    padding: 11px 13px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .hint i { font-size: 15px; color: var(--tx2); flex-shrink: 0; margin-top: 1px; }
+
+  .hint-text { font-size: 12px; color: var(--tx2); line-height: 1.6; }
+
+  .hint-text code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--tx);
+    background: var(--bg3);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+
+  /* ── SUCCESS SCREEN ─────────────────────── */
+  #success-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  #success-screen.show { display: flex; }
+
+  .success-ico {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: var(--green-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+    border: 1px solid rgba(52,211,153,.25);
+  }
+
+  .success-ico i { font-size: 30px; color: var(--green); }
+
+  .success-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+
+  .success-sub { font-size: 13px; color: var(--tx2); margin-bottom: 1.5rem; }
+
+  .btn-back {
+    padding: 9px 22px;
+    background: transparent;
+    border: 1px solid var(--line2);
+    border-radius: var(--rs);
+    color: var(--tx2);
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: background .18s;
+  }
+
+  .btn-back:hover { background: var(--bg2); color: var(--tx); }
+
+  /* ── DIVIDER ────────────────────────────── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 1.25rem 0;
+  }
+
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  .divider span { font-size: 12px; color: var(--tx3); }
+</style>
+</head>
+<body>
+<form action="/login" method="POST">
+
+  <div class="err-box" id="err-box">
+    <i class="ti ti-alert-circle"></i>
+    <span id="err-msg">Identifiants incorrects.</span>
+  </div>
+
+  <div class="fld">
+    <label>Nom d'utilisateur</label>
+    <div class="inp-wrap">
+      <i class="ti ti-user ico-left"></i>
+      <input
+              id="username"
+              name="username"
+              type="text"
+              placeholder="nom.utilisateur"
+              autocomplete="username"
+              oninput="clearErr()"
+              required
+      />
+    </div>
+  </div>
+
+  <div class="fld">
+    <label>Mot de passe</label>
+    <div class="inp-wrap">
+      <i class="ti ti-lock ico-left"></i>
+      <input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              oninput="clearErr()"
+              required
+      />
+      <i class="ti ti-eye ico-right" id="eye-ico" onclick="togglePw()" title="Afficher/masquer"></i>
+    </div>
+  </div>
+
+  <button type="submit" class="submit">
+    Se connecter
+    <i class="ti ti-arrow-right"></i>
+  </button>
+
+</form>
+<script>
+/* ── DATA ─────────────────────────────── */
+const USERS = [
+  { username: 'admin',       password: 'admin123', role: 'admin',      label: 'Administrateur' },
+  { username: 'prof.benali', password: '1234',     role: 'enseignant', label: 'Prof. Benali Sara' },
+  { username: 'prof.martin', password: 'abcd',     role: 'enseignant', label: 'Prof. Martin Paul' },
+  { username: 'y.alami',     password: 'etu123',   role: 'etudiant',   label: 'Alami Yassine' },
+  { username: 'f.elfassi',   password: 'etu456',   role: 'etudiant',   label: 'El Fassi Fatima' },
+  { username: 'm.ouali',     password: 'etu789',   role: 'etudiant',   label: 'Ouali Mehdi' },
+];
+
+let currentRole = 'admin';
+
+/* ── ROLE SWITCH ──────────────────────── */
+function setRole(el, role) {
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  currentRole = role;
+  clearErr();
+}
+
+/* ── ERROR ────────────────────────────── */
+function clearErr() {
+  document.getElementById('err-box').classList.remove('show');
+}
+
+function showErr(msg) {
+  document.getElementById('err-msg').textContent = msg;
+  document.getElementById('err-box').classList.add('show');
+}
+
+/* ── PASSWORD TOGGLE ──────────────────── */
+function togglePw() {
+  const inp = document.getElementById('password');
+  const ico = document.getElementById('eye-ico');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    ico.className = 'ti ti-eye-off ico-right';
+  } else {
+    inp.type = 'password';
+    ico.className = 'ti ti-eye ico-right';
+  }
+}
+
+/* ── LOGIN ────────────────────────────── */
+function doLogin() {
+  const u = document.getElementById('username').value.trim();
+  const p = document.getElementById('password').value;
+
+  if (!u) { showErr('Veuillez saisir votre identifiant.'); return; }
+  if (!p) { showErr('Veuillez saisir votre mot de passe.'); return; }
+
+  const match = USERS.find(x => x.username === u && x.password === p);
+
+  if (!match) {
+    showErr('Identifiants incorrects. Vérifiez votre saisie.');
+    return;
+  }
+
+  if (match.role !== currentRole) {
+    showErr('Ce compte n\'appartient pas au rôle sélectionné.');
+    return;
+  }
+
+  /* SUCCESS */
+  const roleLabels = { admin: 'Administrateur', enseignant: 'Enseignant', etudiant: 'Étudiant' };
+  document.getElementById('s-title').textContent = 'Connexion réussie !';
+  document.getElementById('s-sub').textContent =
+    'Bienvenue, ' + match.label + '. Vous êtes connecté en tant que ' + roleLabels[match.role] + '.';
+
+  document.getElementById('form-screen').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+
+  /*
+    ICI : rediriger vers le tableau de bord selon le rôle
+    Exemples :
+      if (match.role === 'admin')      window.location.href = 'admin.html';
+      if (match.role === 'enseignant') window.location.href = 'prof.html';
+      if (match.role === 'etudiant')   window.location.href = 'etudiant.html';
+  */
+}
+
+/* ── RESET ────────────────────────────── */
+function resetForm() {
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+  document.getElementById('password').type = 'password';
+  document.getElementById('eye-ico').className = 'ti ti-eye ico-right';
+  clearErr();
+  document.getElementById('form-screen').style.display = '';
+  document.getElementById('success-screen').classList.remove('show');
+}
+
+/* ── KEYBOARD ─────────────────────────── */
+document.getElementById('username').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('password').focus();
+});
+document.getElementById('password').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+
+</body>
+</html>
